@@ -1,0 +1,1 @@
+# qgis-auto-maps-image
