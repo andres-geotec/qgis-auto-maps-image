@@ -3,7 +3,8 @@ from qgis.utils import iface
 import os
 
 #methodName = 'Jenks'
-methodName = 'EqualInterval'
+#methodName = 'EqualInterval'
+methods = ['Jenks', 'EqualInterval']
 
 dataMaps = [{
     'file': "ingreso_sintomas_todos",
@@ -11,7 +12,7 @@ dataMaps = [{
     'subtitle': 'Tiempo promedio entre fecha de síntomas e ingreso',
     'date': '22 de Noviembre de 2020',
     'note': "Promedio municipal de días desde 'FECHA_SINTOMAS' a 'FECHA_INGRESO'. Para los municipios con menos de 3 casos positivos se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "201119COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201122COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'variant': 'tiempo_ingreso_sintomas',
     'targetFieldName': 'cvegeomun',
@@ -119,6 +120,17 @@ symbol_edos = QgsFillSymbol.createSimple({
     'joinstyle': 'bevel',
     'outline_width_unit': 'MM'
 })
+def createSymbolUnfilled(outlineWidth):
+    return QgsFillSymbol.createSimple({
+        'outline_width': str(outlineWidth),
+        'outline_color': '35,35,35,255',
+        'offset_unit': 'MM',
+        'color': '0,0,0,255',
+        'outline_style': 'solid',
+        'style': 'no',
+        'joinstyle': 'bevel',
+        'outline_width_unit': 'MM'
+    })
 
 
 def loadLayerGpkg(file, layername, name, symbol=None):
@@ -175,17 +187,29 @@ def invertColorRamp(colorRamp):
     invert.setStops(newStops)
     return invert
 
-def addClasification(targetFieldNameData, methodName, colorRamp, legendName):
-    print(targetFieldNameData)
+def addClasification(targetFieldNameData, methodName, colorRamp):
     muns.setRenderer(QgsGraduatedSymbolRenderer(targetFieldNameData))
     muns.renderer().updateClasses(muns, graduatedMethod(methodName), 5)
     ramp = QgsStyle().defaultStyle().colorRamp(colorRamp)
     muns.renderer().updateColorRamp(invertColorRamp(ramp))
     muns.renderer().updateSymbols(QgsFillSymbol.createSimple({'outline_width': '0.05'}))
-    muns.setName(dataMap['legend'])
-    text = muns.renderer().legendSymbolItems()[0].label
-    muns.renderer().legendSymbolItems()[0].label = f'{text} ()'
     muns.triggerRepaint()
+
+def formatLegendlabel(eval):
+    min = float(eval.split(' - ')[0])
+    max = float(eval.split(' - ')[1])
+    query = f'"{targetFieldNameData}" > {min} and "{targetFieldNameData}" < {max}'
+    muns.selectByExpression(query, QgsVectorLayer.SetSelection)
+    format = f'{min:.1f} - {max:.1f} ({len(muns.selectedFeatures()):,})'
+    #print(format)
+    return format
+
+def settingsLegend(legend, legendName):
+    muns.setName(legendName)
+    legendlayer = legend.model().rootGroup().addLayer(muns)
+    legend.model().refreshLayerLegend(legendlayer)
+    for i in legend.model().layerLegendNodes(legendlayer):
+        i.setUserLabel((formatLegendlabel(i.evaluateLabel())))
 
 def createLayout(templeteQpt):
     #Create document
@@ -198,16 +222,17 @@ def createLayout(templeteQpt):
 
 
 #Municipios
+munsBackground = loadLayerGpkg('mun_2019.gpkg', 'mun_2019', 'Fondo', createSymbolUnfilled(0.05))
 muns = loadLayerGpkg('mun_2019.gpkg', 'mun_2019', 'Municipios')
 
 #Estados
-edos = loadLayerGpkg('edos_2019.gpkg', 'edos_2019', 'Estados', symbol_edos)
+edos = loadLayerGpkg('edos_2019.gpkg', 'edos_2019', 'Estados', createSymbolUnfilled(0.86))
 
 
 #def createMap(dataMap):
 #for dataMap in dataMaps[:2]:
-for dataMap in dataMaps[:1]:
-    print('Creando mapa', dataMap['file'])
+for i, dataMap in enumerate(dataMaps):
+    print(i, 'Creando mapa', dataMap['file'])
 
     #Prepare data in layer
     csv = loadCsvFile(dataMap['file'])
@@ -216,44 +241,53 @@ for dataMap in dataMaps[:1]:
 
     #Add Clasification
     targetFieldNameData = f"{dataMap['file']}_{dataMap['variant']}"
-    addClasification(targetFieldNameData, methodName, dataMap['colorRamp'], dataMap['legend'])
+    print(targetFieldNameData)
+    
+    for methodName in methods:
+        addClasification(targetFieldNameData, methodName, dataMap['colorRamp'])
 
-    #Create layout
-    layout = createLayout(dataMap['template'])
+        #Create layout
+        layout = createLayout(dataMap['template'])
 
-    ##Add Texts
-    layout.itemById('title').setText(dataMap['title'])
-    layout.itemById('subtitle').setText(dataMap['subtitle'])
-    layout.itemById('date').setText(dataMap['date'])
-    layout.itemById('note').setText(dataMap['note'])
-    layout.itemById('source').setText(dataMap['source'])
+        ##Add Texts
+        layout.itemById('title').setText(dataMap['title'])
+        layout.itemById('subtitle').setText(dataMap['subtitle'])
+        layout.itemById('date').setText(dataMap['date'])
+        layout.itemById('note').setText(dataMap['note'])
+        layout.itemById('source').setText(dataMap['source'])
 
-    ##Add Map main
-    map = layout.itemById('map')
-    map.setLayers([edos, muns])
+        ##Add Map main
+        map = layout.itemById('map')
+        map.setLayers([edos, muns, munsBackground])
 
-    ##Add Map miniature
-    miniature = layout.itemById('miniature')
-    miniature.setLayers([edos, muns])
+        ##Add Map miniature
+        miniature = layout.itemById('miniature')
+        miniature.setLayers([edos, muns])
 
-    #Legend
-    legend = layout.itemById('legend')
-    #legend.setLinkedMap(map)
-    root = QgsLayerTree()
-    root.addLayer(muns)
-    legend.model().setRootGroup(root)
+        #Legend
+        legend = layout.itemById('legend')
+        #legend.setLinkedMap(map)
+        #root = QgsLayerTree()
+        #root.addLayer(muns)
+        #legend.model().setRootGroup(root)
+        settingsLegend(legend, dataMap['legend'])
+        
+        #Logo
+        base_path = os.path.join(QgsProject.instance().homePath())
+        logo = layout.itemById('logo')
+        logo.setPicturePath(os.path.join(base_path, 'logos', 'log_conacyt_horizontal_sin_sintagma.png'))
+        #logo.setSvgFillColor(QColor('#002663'))
 
-    #Instance Iamage Path
-    base_path = os.path.join(QgsProject.instance().homePath())
-    image_name = f"{dataMap['file']}_{methodName}.png"
-    image_path = os.path.join(base_path, image_name)
+        #Instance Iamage Path
+        image_name = f"{i}_{dataMap['file']}_{methodName}.png"
+        image_path = os.path.join(base_path, image_name)
 
-    #Export Image
-    exporter = QgsLayoutExporter(layout)
-    exporter.exportToImage(image_path, QgsLayoutExporter.ImageExportSettings())
+        #Export Image
+        exporter = QgsLayoutExporter(layout)
+        exporter.exportToImage(image_path, QgsLayoutExporter.ImageExportSettings())
 
+        print('Mapa generado', image_name)
     muns.removeJoin(join.joinLayerId())
-    print('Mapa generado', image_name)
     
 #createMap(dataMaps[0])
 print('*** Proceso finalizado ***')
