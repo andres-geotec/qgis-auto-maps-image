@@ -1,24 +1,35 @@
 from qgis.PyQt.QtXml import QDomDocument
+from qgis.PyQt import QtGui
 from qgis.utils import iface
 import os
 
-methods = ['Jenks', 'Quantile']
-#'EqualInterval'
+methods = ['Jenks']
 
 dataMaps = [{
-    'file': "ingreso_sintomas_todos",
-    'title': 'Accesibilidad hospitalaria',
-    'subtitle': 'Tiempo promedio entre fecha de síntomas e ingreso',
+    'file': 'resultado_ingreso_ambulatorios_semanas',
+    'title': 'Respuesta hospitalaria',
+    'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas no hospitalizadas',
     'date': '22 de Noviembre de 2020',
-    'note': "Promedio municipal de días desde 'FECHA_SINTOMAS' a 'FECHA_INGRESO'. Para los municipios con menos de 3 casos positivos se utilizó el promedio por jurisdicción sanitaria.",
+    'note': 'Días promedio desde "FECHA_INGRESO" a "FECHA_RESULTADO", agrupado por municipio y semana epidemiológica. En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
     'source': 'Secretaría de Salud: "201122COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
-    'variant': 'tiempo_ingreso_sintomas',
     'targetFieldName': 'cvegeomun',
-    'template': 'respuestaHospitalaria.qpt',
-    'colorRamp': 'RdYlGn',
-    'methods': 'Jenks,Quantile'
+    'template': 'respuestaHospitalariaGif.qpt',
+    'colorRamp': 'RdYlGn'
+}, {
+    'file': 'resultado_ingreso_hospitalizados_semanas',
+    'title': 'Respuesta hospitalaria',
+    'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas hospitalizadas',
+    'date': '22 de Noviembre de 2020',
+    'note': 'Días promedio desde "FECHA_INGRESO" a "FECHA_RESULTADO", agrupado por por municipio y semana epidemiológica. En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
+    'source': 'Secretaría de Salud: "201122COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'legend': 'Días Promedio',
+    'targetFieldName': 'cvegeomun',
+    'template': 'respuestaHospitalariaGif.qpt',
+    'colorRamp': 'RdYlGn'
 }]
+
+semanas = ['03','05','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47']
 
 
 #Instance path proyect application
@@ -26,12 +37,12 @@ path = '/home/andres/Proyectos/CONACyT/AtencionHospitalaria/auto-map-tiempo-hosp
 os.chdir(path)
 project = QgsProject()
 
-def createSymbolUnfilled(outlineWidth):
+def createSymbol(outlineWidth, fillColor):
     return QgsFillSymbol.createSimple({
         'outline_width': str(outlineWidth),
         'outline_color': '35,35,35,255',
         'offset_unit': 'MM',
-        'color': '0,0,0,255',
+        'color': str(fillColor),
         'outline_style': 'solid',
         'style': 'no',
         'joinstyle': 'bevel',
@@ -81,47 +92,52 @@ def graduatedMethod(name):
     if (name == 'Quantile'):
         return QgsGraduatedSymbolRenderer.Quantile
 
-def removeStopColorRamp(colorRamp):
-    newColorRamp = QgsGradientColorRamp()
-    newColorRamp.setColor1(colorRamp.color1())
-    newStops = []
-    countFinal = len(colorRamp.stops()) - 1
-    offset = 1 / countFinal
-    for i, stop in enumerate(colorRamp.stops()):
-        if i == countFinal:
-            newColorRamp.setColor2(stop.color)
-            #print('eliminar color', i, stop.offset, stop.color.name())
-        else:
-            stop.offset = offset * (i + 1)
-            newStops.append(stop)
-            #print(i, stop.offset, stop.color.name())
-    newColorRamp.setStops(newStops)
-    return newColorRamp
-
-def invertColorRamp(colorRamp, colorRampName):
+def invertColorRamp(colorRamp):
     invert = QgsGradientColorRamp()
     invert.setColor1(colorRamp.color2())
     invert.setColor2(colorRamp.color1())
     stops = colorRamp.stops().copy()
     newStops = []
     for i in range(len(stops)):
-        #print(i, colorRamp.stops()[i].color.name(), '=>', len(stops)-i-1)
+        #print(i, len(stops)-i-1)
         newStops.append(colorRamp.stops()[i])
         newStops[i].color = stops[len(stops)-i-1].color
         #print(stop.offset, stop.color.name())
     invert.setStops(newStops)
-    if colorRampName == 'Greens':
-        return removeStopColorRamp(removeStopColorRamp(invert))
-    if colorRampName == 'Greys':
-        invert.setColor1(QColor('#3a3a3a'))
-        invert.setColor2(QColor('#dddddd'))
     return invert
 
-def addClasification(targetFieldNameData, methodName, colorRampName):
+def addClasification(targetFieldNameData, methodName, colorRamp):
     muns.setRenderer(QgsGraduatedSymbolRenderer(targetFieldNameData))
     muns.renderer().updateClasses(muns, graduatedMethod(methodName), 5)
-    ramp = QgsStyle().defaultStyle().colorRamp(colorRampName)
-    muns.renderer().updateColorRamp(invertColorRamp(ramp, colorRampName))
+    ramp = QgsStyle().defaultStyle().colorRamp(colorRamp)
+    muns.renderer().updateColorRamp(invertColorRamp(ramp))
+    muns.renderer().updateSymbols(QgsFillSymbol.createSimple({'outline_width': '0.05'}))
+    muns.triggerRepaint()
+    
+def addClasificationDefined(targetFieldNameData):
+    classes = [
+        {'min':0, 'max':1,'color':'#1a9641','label':'0 - 1'},
+        {'min':1.1, 'max':3,'color':'#a6d96a','label':'1.1 - 3'},
+        {'min':3.1, 'max':5,'color':'#ffffc0','label':'3.1 - 5'},
+        {'min':5.1, 'max':8,'color':'#fdae61','label':'5.1 - 8'},
+        {'min':8.1, 'max':500,'color':'#d7191c','label':'Más de 8'}
+    ]
+    #myTargetField = targetFieldNameData
+    rangeList = []
+    # Make our first symbol and range...
+    for _class in classes:
+        color = QtGui.QColor(_class['color'])
+        symbol = QgsSymbol.defaultSymbol(muns.geometryType())
+        symbol.setColor(color)
+        _range = QgsRendererRange(_class['min'], _class['max'], symbol, _class['label'])
+        rangeList.append(_range)
+    
+    renderer = QgsGraduatedSymbolRenderer('', rangeList)
+    classificationMethod = QgsApplication.classificationMethodRegistry().method("Jenks")
+    renderer.setClassificationMethod(classificationMethod)
+    renderer.setClassAttribute(targetFieldNameData)
+
+    muns.setRenderer(renderer)
     muns.renderer().updateSymbols(QgsFillSymbol.createSimple({'outline_width': '0.05'}))
     muns.triggerRepaint()
 
@@ -131,6 +147,7 @@ def formatLegendlabel(eval):
     query = f'"{targetFieldNameData}" > {min} and "{targetFieldNameData}" < {max}'
     muns.selectByExpression(query, QgsVectorLayer.SetSelection)
     format = f'{min:.1f} - {max:.1f} ({len(muns.selectedFeatures()):,})'
+    #print(format)
     return format
 
 def settingsLegend(legend, legendName):
@@ -151,28 +168,35 @@ def createLayout(templeteQpt):
 
 
 #Municipios
+munsBackground = loadLayerGpkg('mun_2019.gpkg', 'mun_2019', 'Fondo', QgsFillSymbol.createSimple({'outline_width': '0.05', 'color': '255,255,255,255'}))
 muns = loadLayerGpkg('mun_2019.gpkg', 'mun_2019', 'Municipios')
 
 #Estados
-edos = loadLayerGpkg('edos_2019.gpkg', 'edos_2019', 'Estados', createSymbolUnfilled(0.86))
+edos = loadLayerGpkg('edos_2019.gpkg', 'edos_2019', 'Estados', createSymbol(0.86, '0,0,0,255'))
 
 
 #def createMap(dataMap):
 #for dataMap in dataMaps[:2]:
-for i, dataMap in enumerate(dataMaps):
-    print(i+1, 'Creando mapa', dataMap['file'])
+for i, dataMap in enumerate(dataMaps[-1:]):
+    print(i, 'Creando mapa', dataMap['file'])
 
     #Prepare data in layer
     csv = loadCsvFile(dataMap['file'])
     join = createJoinData(csv, dataMap['targetFieldName'])
     muns.addJoin(join)
 
-    #Add Clasification
-    targetFieldNameData = f"{dataMap['file']}_{dataMap['variant']}"
-    print(targetFieldNameData)
+    #for semana in semanas:
+    for semana in semanas[-1:]:
+        #Add Clasification
+        targetFieldNameData = f"{dataMap['file']}_{semana}"
+        print(targetFieldNameData)
+        
+        #for methodName in methods:
+        #addClasification(targetFieldNameData, methods[0], dataMap['colorRamp'])
+        addClasificationDefined(targetFieldNameData)
+        
+        QgsProject.instance().addMapLayer(muns)
+
     
-    #for methodName in methods:
-    addClasification(targetFieldNameData, methods[0], dataMap['colorRamp'])
-    QgsProject.instance().addMapLayer(muns)
-    
+#createMap(dataMaps[0])
 print('*** Proceso finalizado ***')
