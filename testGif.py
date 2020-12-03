@@ -200,3 +200,21 @@ for i, dataMap in enumerate(dataMaps[-1:]):
     
 #createMap(dataMaps[0])
 print('*** Proceso finalizado ***')
+
+#Devuelve el texto del rango de fechas por semana epidemiológica
+def getTextDateRangesByWeek(weekNumber):
+    def getDateOfWeek(weekNumber, nDay):
+        year = 2020
+        weeksInYear = 53
+        if int(weekNumber) > weeksInYear:
+            #Si la semana sobrepasa la capacidad del año, aumentar el año en cuestión
+            weekNumber -= weeksInYear
+            year += 1
+        return datetime.strptime(f'{year}-W{weekNumber}-{nDay}', '%G-W%V-%u')
+    ini = getDateOfWeek(weekNumber-1, 7)
+    fin = getDateOfWeek(weekNumber, 6)
+    label = f"Del {ini.day:02d}"
+    if ini.strftime('%B') != fin.strftime('%B'):
+        #Si los meses de las fechas no coinciden, mostrar ambos meses
+        label += f" de {ini.strftime('%B')}"
+    return f"({label} al {fin.day:02d} de {fin.strftime('%B')})"

@@ -10,9 +10,9 @@ dataMaps = [{
     'file': 'resultado_ingreso_ambulatorios_semanas',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas no hospitalizadas',
-    'date': '22 de Noviembre de 2020',
+    'date': '02 de Diciembre de 2020',
     'note': 'Días promedio desde "FECHA_INGRESO" a "FECHA_RESULTADO", agrupado por municipio y semana epidemiológica. En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
-    'source': 'Secretaría de Salud: "201122COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalariaGif.qpt'
@@ -20,19 +20,19 @@ dataMaps = [{
     'file': 'resultado_ingreso_hospitalizados_semanas',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas hospitalizadas',
-    'date': '22 de Noviembre de 2020',
+    'date': '02 de Diciembre de 2020',
     'note': 'Días promedio desde "FECHA_INGRESO" a "FECHA_RESULTADO", agrupado por municipio y semana epidemiológica. En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
-    'source': 'Secretaría de Salud: "201122COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalariaGif.qpt'
 }]
 
-semanas = ['03','05','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47']
+semanas = ['10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47']
 
 
 #Instance path proyect application
-path = '/home/andres/Proyectos/CONACyT/AtencionHospitalaria/auto-map-tiempo-hospital/data'
+path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/201202COVID19MEXICOTOT/'
 os.chdir(path)
 project = QgsProject()
 
@@ -74,7 +74,7 @@ def createJoinData(csv, targetFieldName):
 
 def loadTempleteQpt(file):
     #Read qpt file
-    templateFile = open(file, 'rt')
+    templateFile = open(os.path.join(templeteFolder, file), 'rt')
     templateContent = templateFile.read()
     templateFile.close()
 
@@ -141,24 +141,32 @@ def createLayout(templeteQpt):
     layout.loadFromTemplate(document, QgsReadWriteContext())
     return layout
 
-def getLabelTextDates(weekNumber):
+#Devuelve el texto del rango de fechas por semana epidemiológica
+def getTextDateRangesByWeek(weekNumber):
     def getDateOfWeek(weekNumber, nDay):
-        return datetime.strptime(f'2020-W{weekNumber}-{nDay}', '%G-W%V-%u')
-    ini = getDateOfWeek(weekNumber, 1)
+        year = 2020
+        weeksInYear = 53
+        if int(weekNumber) > weeksInYear:
+            #Si la semana sobrepasa la capacidad del año, aumentar el año en cuestión
+            weekNumber -= weeksInYear
+            year += 1
+        return datetime.strptime(f'{year}-W{weekNumber}-{nDay}', '%G-W%V-%u')
+    ini = getDateOfWeek(int(weekNumber)-1, 7)
     fin = getDateOfWeek(weekNumber, 6)
-    if ini.strftime('%B') == fin.strftime('%B'):
-        return f"(Del {ini.day-1:02d} al {fin.day:02d} de {fin.strftime('%B')})"
-    else:
-        return f"(Del {ini.day-1:02d} de {ini.strftime('%B')} al {fin.day:02d} de {fin.strftime('%B')})"
+    label = f"Del {ini.day:02d}"
+    if ini.strftime('%B') != fin.strftime('%B'):
+        #Si los meses de las fechas no coinciden, mostrar ambos meses
+        label += f" de {ini.strftime('%B')}"
+    return f"({label} al {fin.day:02d} de {fin.strftime('%B')})"
 
 
 #Municipios
-munsBackground = loadLayerGpkg('mun_2019.gpkg', 'mun_2019', 'Sin ingresos', 
+munsBackground = loadLayerGpkg(os.path.join(templeteFolder, 'mun_2019.gpkg'), 'mun_2019', 'Sin ingresos', 
     QgsFillSymbol.createSimple({'outline_width': '0.05', 'color': '255,255,255,255'}))
-muns = loadLayerGpkg('mun_2019.gpkg', 'mun_2019', 'Municipios')
+muns = loadLayerGpkg(os.path.join(templeteFolder, 'mun_2019.gpkg'), 'mun_2019', 'Municipios')
 
 #Estados
-edos = loadLayerGpkg('edos_2019.gpkg', 'edos_2019', 'Estados', createSymbol(0.86, '0,0,0,255'))
+edos = loadLayerGpkg(os.path.join(templeteFolder, 'edos_2019.gpkg'), 'edos_2019', 'Estados', createSymbol(0.86, '0,0,0,255'))
 
 
 #def createMap(dataMap):
@@ -172,7 +180,7 @@ for i, dataMap in enumerate(dataMaps):
     muns.addJoin(join)
 
     #for semana in semanas[-5:]:
-    for semana in semanas[-1:]:
+    for semana in semanas:
         #Add Clasification
         targetFieldNameData = f"{dataMap['file']}_{semana}"
         print(targetFieldNameData)
@@ -191,7 +199,7 @@ for i, dataMap in enumerate(dataMaps):
             layout.itemById('note').setText(dataMap['note'])
             layout.itemById('source').setText(dataMap['source'])
             layout.itemById('semana_title').setText(f'Semana Epidemiológica {semana}')
-            layout.itemById('semana_rango').setText(getLabelTextDates(semana).replace("00", "31 de mayo"))
+            layout.itemById('semana_rango').setText(getTextDateRangesByWeek(semana))
 
             ##Add Map main
             map = layout.itemById('map')
@@ -215,7 +223,7 @@ for i, dataMap in enumerate(dataMaps):
             #Logo
             base_path = os.path.join(QgsProject.instance().homePath())
             logo = layout.itemById('logo')
-            logo.setPicturePath(os.path.join(base_path, 'logos', 'log_conacyt_horizontal_sin_sintagma.png'))
+            logo.setPicturePath(os.path.join(templeteFolder, 'log_conacyt_horizontal_sin_sintagma.png'))
             #logo.setSvgFillColor(QColor('#002663'))
 
             #Instance Iamage Path

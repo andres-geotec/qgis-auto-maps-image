@@ -109,11 +109,11 @@ dataMaps = [{
     'colorRamp': '-RdYlGn',
     'methods': 'Jenks',
     'classes': [
-        {'min':-13.2, 'max':1,'color':'#1a9641','label':'-13.2 - 1'},
+        {'min':'<', 'max':1,'color':'#1a9641','label':'< - 1'},
         {'min':1, 'max':3,'color':'#a6d96a','label':'1.1 - 3'},
         {'min':3, 'max':5,'color':'#ffffc0','label':'3.1 - 5'},
         {'min':5, 'max':8,'color':'#fdae61','label':'5.1 - 8'},
-        {'min':8, 'max':99,'color':'#d7191c','label':'8.1 - 99'}
+        {'min':8, 'max':'>','color':'#d7191c','label':'8.1 - >'}
     ]
 }, {
     'file': 'resultado_ingreso_hospitalizados',
@@ -137,6 +137,7 @@ dataMaps = [{
     ]
 }]
 
+#-------------------- ESTILOS DE CAPAS --------------------
 #Devuelve un estilo para poligonos sin color de relleno
 def createSymbolUnfilled(outlineWidth='0.26'):
     return QgsFillSymbol.createSimple({
@@ -150,6 +151,88 @@ def createSymbolUnfilled(outlineWidth='0.26'):
         'outline_width_unit': 'MM'
     })
 
+#Crea una lista de colores intermedios para una paleta de colores
+def defineIntermediateColorsRamp(colors):
+    #offset determina la pocisión de los colores intermedios o `stops`
+    offset = round(1 / (len(colors) + 1), 2)
+    return [QgsGradientStop(offset*(i+1), QColor(color)) for i, color in enumerate(colors)]
+
+#Devuelve la lista de colores intermedios en hexadecimal
+def getIntermediateHexaColorsRamp(colorRamp):
+    return [stop.color.name() for stop in colorRamp.stops()].copy()
+
+#Crea una paleta a partir de una lista de colores en hexadecimal
+def createRampByColors(colors):
+    colorRamp = QgsGradientColorRamp()
+    colorRamp.setColor1(QColor(colors[0]))
+    colorRamp.setColor2(QColor(colors[-1]))
+    colorRamp.setStops(defineIntermediateColorsRamp(colors[1:-1]))
+    return colorRamp
+
+#Invierte una paleta de colores
+def invertColorRamp(colorRamp):
+    invert = QgsGradientColorRamp()
+    invert.setColor1(colorRamp.color2())
+    invert.setColor2(colorRamp.color1())
+    intermediateColors = getIntermediateHexaColorsRamp(colorRamp)
+    intermediateColors.reverse()
+    invert.setStops(defineIntermediateColorsRamp(intermediateColors))
+    return invert
+
+#Elimina colores intermedios de una paleta de colores
+def removeIntermediateColorRamp(colorRamp, remove, start=False):
+    newColorRamp = QgsGradientColorRamp()
+    if remove > len(colorRamp.stops()): remove = len(colorRamp.stops())
+    intermediateColors = getIntermediateHexaColorsRamp(colorRamp)
+    if start:
+        newColorRamp.setColor1(QColor(intermediateColors[remove-1]))
+        newColorRamp.setStops(defineIntermediateColorsRamp(intermediateColors[remove:]))
+        newColorRamp.setColor2(colorRamp.color2())
+    else:
+        newColorRamp.setColor1(colorRamp.color1())
+        newColorRamp.setStops(defineIntermediateColorsRamp(intermediateColors[:-remove]))
+        newColorRamp.setColor2(QColor(intermediateColors[-remove]))
+    return newColorRamp
+
+#Define el tipo de paleta seun el parámetro
+# 1 '#,#,#'     -> lista de colores en hexadecimal
+# 2 'RdYlGn'    -> nombre de paleta establecida
+# 3 '-RdYlGn'   -> paleta establecida invertida
+# 4 'RdYlGn-1'  -> paleta establecida menos un color al final
+# 5 'RdYlGn-|1' -> paleta establecida menos un color al inicio
+def defineRampColor(colorRampName):
+    if ',' in colorRampName:
+        #Si es una lista de colores separada por comas
+        return createRampByColors(colorRampName.split(','))
+    invert = False
+    if colorRampName.startswith('-'):
+        #Si es necesario invertirla
+        invert = True
+        colorRampName = colorRampName[1:]
+    remove = ''
+    if '-' in colorRampName:
+        #Si es necesario remover colores
+        separe = colorRampName.split('-')
+        colorRampName = separe[0]
+        remove = separe[1]
+    if colorRampName in QgsStyle().defaultStyle().colorRampNames():
+        #Si la paleta establecida existe
+        colorRamp = QgsStyle().defaultStyle().colorRamp(colorRampName)
+        if invert: colorRamp = invertColorRamp(colorRamp)
+        if bool(remove):
+            removeStart = False
+            if remove.startswith('|'):
+                #Si hay que remover colores al inicio
+                removeStart = True
+            remove = [int(i) for i in remove.split('|') if i.isdigit()][0]
+            colorRamp = removeIntermediateColorRamp(colorRamp, remove, removeStart)
+        return colorRamp
+    else:
+        print('La rampa de colores no existe')
+        return QgsGradientColorRamp()
+#-------------------- ESTILOS DE CAPAS --------------------
+
+#-------------------- CARGA DE ARCHIVOS --------------------
 #Carga un layer de un geopakage asignandole nombre y simbolo
 def loadLayerGpkg(file, layerName, name, symbol=None):
     gpkg_layer = file + "|layername=" + layerName
@@ -157,21 +240,57 @@ def loadLayerGpkg(file, layerName, name, symbol=None):
     if symbol: vectorlayer.renderer().setSymbol(symbol)
     return vectorlayer
 
-#Cargar un csv
-def loadCsvFile(file):
-    uri = f"file://{os.getcwd()}/{file}.csv?type=csv&delimiter=,&detectTypes=no"
+#Cargar un csv como layer en el proyecto
+def loadCsvFile(file, delimiter=','):
+    uri = f"file://{os.getcwd()}/{file}.csv?type=csv&delimiter={delimiter}&detectTypes=no"
     return QgsVectorLayer(uri, file, 'delimitedtext')
 
-#Crea union de datos entre layer y csv
-def createJoinData(csv, targetFieldName):
+#Crea una hoja de impresión a partir de un archivo qpt
+def createLayoutFromTemplate(file):
+    #Read qpt file
+    templateFile = open(os.path.join(templeteFolder, file), 'rt')
+    templateContent = templateFile.read()
+    templateFile.close()
+    #Create document
+    document = QDomDocument()
+    document.setContent(templateContent)
+    #Create layout
+    layout = QgsPrintLayout(project)
+    layout.initializeDefaults()
+    layout.loadFromTemplate(document, QgsReadWriteContext())
+    return layout
+#-------------------- CARGA DE ARCHIVOS --------------------
+
+#-------------------- TRATAMIENTO DE DATOS --------------------
+#Establece los parametros de union etre layers
+def defineJoinData(joinLayer, targetFieldName):
     join = QgsVectorLayerJoinInfo()
     join.setJoinFieldName(targetFieldName)
     join.setTargetFieldName(targetFieldName)
-    join.setJoinLayer(csv)
+    join.setJoinLayer(joinLayer)
     join.setUsingMemoryCache(True)
     #join.setPrefix('_')
     return join
 
+#Lista de atributos por columna
+def getAttributesByField(layer, field):
+    idxField = layer.fields().names().index(field)
+    return [feature.attributes()[idxField] for feature in layer.dataProvider().getFeatures()]
+
+#Valores minimos y maximos por columna    
+def getMinMaxValuesByField(layer, field):
+    values = getAttributesByField(layer, field)
+    values.sort()
+    return values[0], values[-1]
+
+def countFeaturesByQuery(query, layer):
+    layer.selectByExpression(query, QgsVectorLayer.SetSelection)
+    num = len(layer.selectedFeatures())
+    layer.removeSelection()
+    return num
+#-------------------- TRATAMIENTO DE DATOS --------------------
+
+#-------------------- CLASIFICACIÓN --------------------
 def graduatedMethod(name):
     if (name == 'Jenks'):
         return QgsGraduatedSymbolRenderer.Jenks
@@ -182,85 +301,6 @@ def graduatedMethod(name):
 
 def classificationMethod(methodName):
     return QgsApplication.classificationMethodRegistry().method(methodName)
-
-def countFeaturesByQuery(query, layer):
-    layer.selectByExpression(query, QgsVectorLayer.SetSelection)
-    num = len(layer.selectedFeatures())
-    layer.removeSelection()
-    return num
-
-def createRampByColors(colors):
-    colorRamp = QgsGradientColorRamp()
-    colorRamp.setColor1(QColor(colors[0]))
-    colorRamp.setColor2(QColor(colors[-1]))
-    offset = 1 / len(colors[1:])
-    stops = []
-    for i, color in enumerate(colors[1:-1]):
-        stops.append(QgsGradientStop(offset * (i + 1), QColor(color)))
-    colorRamp.setStops(stops)
-    return colorRamp
-
-def invertColorRamp(colorRamp):
-    invert = QgsGradientColorRamp()
-    invert.setColor1(colorRamp.color2())
-    invert.setColor2(colorRamp.color1())
-    stops = colorRamp.stops().copy()
-    newStops = []
-    for i, stop in enumerate(stops):
-        newStops.append(QgsGradientStop(stop.offset, stops[len(stops)-i-1].color))
-        #print(f'{i} ({stop.offset}:{stop.color.name()}) => ({newStops[i].offset}:{newStops[i].color.name()})')
-    invert.setStops(newStops)
-    return invert
-
-def removeStopColorRamp(colorRamp, remove, start=False):
-    newColorRamp = QgsGradientColorRamp()
-    nStops = len(colorRamp.stops()) - remove
-    if nStops < 0: nStops = 0
-    offset = round(1 / (nStops + 1), 2)
-    newStops = []
-    
-    if start:
-        for i in range(nStops):
-            #print(f'{i} ({offset * (i + 1)}:{colorRamp.stops()[i + remove].color.getRgb()})')
-            newStops.append(QgsGradientStop(offset * (i + 1), colorRamp.stops()[i + remove].color))
-        newColorRamp.setColor1(colorRamp.stops()[-nStops-1].color)
-        newColorRamp.setColor2(colorRamp.color2())
-    else:
-        for i in range(nStops):
-            #print(f'{i} ({offset * (i + 1)}:{colorRamp.stops()[i].color.getRgb()})')
-            newStops.append(QgsGradientStop(offset * (i + 1), colorRamp.stops()[i].color))
-        newColorRamp.setColor1(colorRamp.color1())
-        newColorRamp.setColor2(colorRamp.stops()[nStops].color)
-    
-    newColorRamp.setStops(newStops)
-    return newColorRamp
-
-def defineRampColor(colorRampName):
-    availableRamps = QgsStyle().defaultStyle().colorRampNames()
-    if ',' in colorRampName:
-        return createRampByColors(colorRampName.split(','))
-    invert = False
-    if colorRampName.startswith('-'):
-        invert = True
-        colorRampName = colorRampName[1:]
-    remove = ''
-    if '-' in colorRampName:
-        separe = colorRampName.split('-')
-        colorRampName = separe[0]
-        remove = separe[1]
-    if colorRampName in availableRamps:
-        colorRamp = QgsStyle().defaultStyle().colorRamp(colorRampName)
-        if invert:
-            colorRamp = invertColorRamp(colorRamp)
-        if bool(remove):
-            removeStart = False
-            if remove.startswith('|'): removeStart = True
-            remove = [int(i) for i in remove.split('|') if i.isdigit()][0]
-            colorRamp = removeStopColorRamp(colorRamp, remove, removeStart)
-        return colorRamp
-    else:
-        print('La rampa de colores no existe')
-        return QgsGradientColorRamp()
 
 def addClassification(targetFieldNameData, methodName, colorRampName):
     muns.setRenderer(QgsGraduatedSymbolRenderer(targetFieldNameData))
@@ -288,37 +328,34 @@ def addClassificationDefined(targetFieldNameData, classes, methodName):
     muns.setRenderer(renderer)
     muns.renderer().updateSymbols(QgsFillSymbol.createSimple({'outline_width': '0.05'}))
     muns.triggerRepaint()
+#-------------------- CLASIFICACIÓN --------------------
 
-def formatLegendlabel(eval):
+#-------------------- IMPRESIÓN --------------------
+def formatLegendlabel(eval, i, ant):
     def format(n):
         if '.' in n: return f'{float(n):.1f}'
         return n
     min = eval.split(' - ')[0]
     max = eval.split(' - ')[1]
-    query = f'"{targetFieldNameData}" >= {float(min)} and "{targetFieldNameData}" < {float(max)}'
-    format = f'{format(min)} - {format(max)} ({countFeaturesByQuery(query, muns):,})'
-    return format
+    #query = f'"{targetFieldNameData}" >= {float(min)} and "{targetFieldNameData}" < {float(max)}'
+    query = f'"{targetFieldNameData}" <= {float(max)}'
+    label = ''
+    count = countFeaturesByQuery(query, muns)-ant
+    if i == 0:
+        if min == max: label = f'{format(min)} ({count:,})'
+        else: label = f'{format(min)} - {format(max)} ({count:,})'
+    else: label = f'{format(str(float(min)+0.1))} - {format(max)} ({count:,})'
+    ant += count
+    return label, ant
 
 def settingsLegend(legend, legendName):
     muns.setName(legendName)
     legendlayer = legend.model().rootGroup().addLayer(muns)
     legend.model().refreshLayerLegend(legendlayer)
-    for i in legend.model().layerLegendNodes(legendlayer):
-        i.setUserLabel((formatLegendlabel(i.evaluateLabel())))
-
-def createLayoutFromTemplate(file):
-    #Read qpt file
-    templateFile = open(os.path.join(templeteFolder, file), 'rt')
-    templateContent = templateFile.read()
-    templateFile.close()
-    #Create document
-    document = QDomDocument()
-    document.setContent(templateContent)
-    #Create layout
-    layout = QgsPrintLayout(project)
-    layout.initializeDefaults()
-    layout.loadFromTemplate(document, QgsReadWriteContext())
-    return layout
+    ant = 0
+    for i, node in enumerate(legend.model().layerLegendNodes(legendlayer)):
+        label, ant = formatLegendlabel(node.evaluateLabel(), i, ant)
+        node.setUserLabel(label)
 
 def buildImageMap(dataMap):
     #Create layout
@@ -347,20 +384,22 @@ def buildImageMap(dataMap):
     logo.setPicturePath(os.path.join(templeteFolder, 'log_conacyt_horizontal_sin_sintagma.png'))
     return layout
 
+#valida que una carpeta exista
 def checkFolder(folder):
     if os.path.isdir(folder) == False:
         os.mkdir(folder)
         print(f'Se ha creao la carpeta {folder}')
 
+#Guarda el layout como imagen
 def exportImageMap(image_name, layout):
     checkFolder(outputFolder)
     image_path = os.path.join(outputFolder, image_name)
-
     #Export Image
     exporter = QgsLayoutExporter(layout)
     exporter.exportToImage(image_path, QgsLayoutExporter.ImageExportSettings())
-
     print('Mapa generado', image_name)
+#-------------------- IMPRESIÓN --------------------
+
 
 
 #Municipios
@@ -373,11 +412,12 @@ edos = loadLayerGpkg(os.path.join(templeteFolder, 'edos_2019.gpkg'), 'edos_2019'
 #def createMap(dataMap):
 #for dataMap in dataMaps[:2]:
 for i, dataMap in enumerate(dataMaps):
+    ant = 0
     print(i+1, 'Creando mapa', dataMap['file'])
 
     #Prepare data in layer
     csv = loadCsvFile(dataMap['file'])
-    join = createJoinData(csv, dataMap['targetFieldName'])
+    join = defineJoinData(csv, dataMap['targetFieldName'])
     muns.addJoin(join)
 
     #Add variants
