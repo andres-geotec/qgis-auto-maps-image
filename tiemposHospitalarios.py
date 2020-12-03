@@ -3,139 +3,142 @@ from qgis.PyQt import QtGui
 from qgis.utils import iface
 import os
 
+
+#Instance path proyect application
+path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/201202COVID19MEXICOTOT/'
+outputFolder = 'image-maps'
+templeteFolder = 'templetes'
+os.chdir(path)
+project = QgsProject()
+
 dataMaps = [{
     'file': "ingreso_sintomas_todos",
     'title': 'Accesibilidad hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de síntomas e ingreso',
-    'date': '22 de Noviembre de 2020',
+    'date': '02 de Diciembre de 2020',
     'note': "Promedio municipal de días desde 'FECHA_SINTOMAS' a 'FECHA_INGRESO'. Para los municipios con menos de 3 casos positivos se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "201122COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
-    'variant': 'tiempo_ingreso_sintomas',
+    'variants': 'tiempo_ingreso_sintomas',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalaria.qpt',
-    'colorRamp': 'RdYlGn',
+    'colorRamp': '-RdYlGn',
     'methods': 'Jenks,Quantile',
     'classes': ''
 }, {
     'file': 'resultado_ingreso_todes',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado',
-    'date': '22 de Noviembre de 2020',
+    'date': '02 de Diciembre de 2020',
     'note': "Promedio municipal de días desde 'FECHA_INGRESO' a 'FECHA_RESULTADO'. Para los municipios con menos de 3 casos positivos se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "201122COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
-    'variant': 'tiempo_resultado_ingreso',
+    'variants': 'tiempo_resultado_ingreso',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalaria.qpt',
-    'colorRamp': 'RdYlGn',
+    'colorRamp': '-RdYlGn',
     'methods': 'Jenks,Quantile',
     'classes': ''
 }, {
     'file': 'alta_ingreso_hospitalizados',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y alta',
-    'date': '22 de Noviembre de 2020',
+    'date': '02 de Diciembre de 2020',
     'note': "Promedio municipal de días desde 'FECHA_INGRESO' a 'FECHA_ALTA' (estimada). Para los municipios con menos de 3 hospitalizaciones se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "201122COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
-    'variant': 'tiempo_alta_ingreso',
+    'variants': 'tiempo_alta_ingreso',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalaria.qpt',
-    'colorRamp': 'Greens',
+    'colorRamp': 'Greens-|2',
     'methods': 'Jenks,Quantile',
     'classes': ''
 }, {
     'file': 'defuncion_ingreso_fallecidos',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y defunción',
-    'date': '22 de Noviembre de 2020',
+    'date': '02 de Diciembre de 2020',
     'note': "Promedio municipal de días desde 'FECHA_INGRESO' a 'FECHA_DEF' (estimada). Para los municipios con menos de 3 defunciones se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "201122COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
-    'variant': 'tiempo_defuncion_ingreso',
+    'variants': 'tiempo_defuncion_ingreso',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalaria.qpt',
-    'colorRamp': 'Greys',
+    'colorRamp': '#333333,#e0e0e0',
     'methods': 'Jenks,Quantile',
     'classes': ''
 }, {
     'file': 'alta_resultado_hospitalizados',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de resultado y alta',
-    'date': '22 de Noviembre de 2020',
+    'date': '02 de Diciembre de 2020',
     'note': "Promedio municipal de días desde 'FECHA_RESULTADO' a 'FECHA_ALTA' (estimada). Para los municipios con menos de 3 hospitalizaciones se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "201122COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
-    'variant': 'tiempo_alta_resultado',
+    'variants': 'tiempo_alta_resultado',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalaria.qpt',
-    'colorRamp': 'Greens',
+    'colorRamp': '-Greens-2',
     'methods': 'Jenks,Quantile',
     'classes': ''
 }, {
     'file': 'defuncion_resultado_fallecidos',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de resultado y defunción',
-    'date': '22 de Noviembre de 2020',
+    'date': '02 de Diciembre de 2020',
     'note': "Promedio municipal de días desde 'FECHA_RESULTADO' a 'FECHA_DEF' (estimada). Para los municipios con menos de 3 defunciones se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "201122COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
-    'variant': 'tiempo_defuncion_resultado',
+    'variants': 'tiempo_defuncion_resultado',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalaria.qpt',
-    'colorRamp': 'Greys',
+    'colorRamp': '#333333,#e0e0e0',
     'methods': 'Jenks,Quantile',
     'classes': ''
 }, {
     'file': 'resultado_ingreso_ambulatorios',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas no hospitalizadas',
-    'date': '22 de Noviembre de 2020',
+    'date': '02 de Diciembre de 2020',
     'note': 'Promedio municipal de días desde "FECHA_INGRESO" a "FECHA_RESULTADO". En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
-    'source': 'Secretaría de Salud: "201122COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
-    'variant': 'tiempo_resultado_ingreso',
+    'variants': 'tiempo_resultado_ingreso',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalaria.qpt',
-    'colorRamp': 'RdYlGn',
-    'methods': 'Jenks,Quantile',
+    'colorRamp': '-RdYlGn',
+    'methods': 'Jenks',
     'classes': [
         {'min':-13.2, 'max':1,'color':'#1a9641','label':'-13.2 - 1'},
-        {'min':1, 'max':3,'color':'#a6d96a','label':'1 - 3'},
-        {'min':3, 'max':5,'color':'#ffffc0','label':'3 - 5'},
-        {'min':5, 'max':8,'color':'#fdae61','label':'5 - 8'},
-        {'min':8, 'max':99,'color':'#d7191c','label':'8 - 99'}
+        {'min':1, 'max':3,'color':'#a6d96a','label':'1.1 - 3'},
+        {'min':3, 'max':5,'color':'#ffffc0','label':'3.1 - 5'},
+        {'min':5, 'max':8,'color':'#fdae61','label':'5.1 - 8'},
+        {'min':8, 'max':99,'color':'#d7191c','label':'8.1 - 99'}
     ]
 }, {
     'file': 'resultado_ingreso_hospitalizados',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas hospitalizadas',
-    'date': '22 de Noviembre de 2020',
+    'date': '02 de Diciembre de 2020',
     'note': 'Promedio municipal de días desde "FECHA_INGRESO" a "FECHA_RESULTADO". En los municipios con menos de 3 hospitalizaciones se utilizó el promedio por jurisdicción sanitaria.',
-    'source': 'Secretaría de Salud: "201122COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
-    'variant': 'tiempo_resultado_ingreso',
+    'variants': 'tiempo_resultado_ingreso',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalaria.qpt',
-    'colorRamp': 'RdYlGn',
-    'methods': 'Jenks,Quantile',
+    'colorRamp': '-RdYlGn',
+    'methods': 'Jenks',
     'classes': [
         {'min':-0.3, 'max':1,'color':'#1a9641','label':'-0.3 - 1'},
-        {'min':1, 'max':3,'color':'#a6d96a','label':'1 - 3'},
-        {'min':3, 'max':5,'color':'#ffffc0','label':'3 - 5'},
-        {'min':5, 'max':8,'color':'#fdae61','label':'5 - 8'},
-        {'min':8, 'max':58,'color':'#d7191c','label':'8 - 57'}
+        {'min':1, 'max':3,'color':'#a6d96a','label':'1.1 - 3'},
+        {'min':3, 'max':5,'color':'#ffffc0','label':'3.1 - 5'},
+        {'min':5, 'max':8,'color':'#fdae61','label':'5.1 - 8'},
+        {'min':8, 'max':58,'color':'#d7191c','label':'8.1 - 57'}
     ]
 }]
 
-
-#Instance path proyect application
-path = '/home/andres/Proyectos/CONACyT/AtencionHospitalaria/auto-map-tiempo-hospital/data'
-os.chdir(path)
-project = QgsProject()
-
-def createSymbolUnfilled(outlineWidth):
+#Devuelve un estilo para poligonos sin color de relleno
+def createSymbolUnfilled(outlineWidth='0.26'):
     return QgsFillSymbol.createSimple({
         'outline_width': str(outlineWidth),
         'outline_color': '35,35,35,255',
@@ -147,22 +150,20 @@ def createSymbolUnfilled(outlineWidth):
         'outline_width_unit': 'MM'
     })
 
-
-def loadLayerGpkg(file, layername, name, symbol=None):
-    gpkg_layer = file + "|layername=" + layername
+#Carga un layer de un geopakage asignandole nombre y simbolo
+def loadLayerGpkg(file, layerName, name, symbol=None):
+    gpkg_layer = file + "|layername=" + layerName
     vectorlayer = QgsVectorLayer(gpkg_layer, name, "ogr")
-    if symbol:
-        vectorlayer.renderer().setSymbol(symbol)
+    if symbol: vectorlayer.renderer().setSymbol(symbol)
     return vectorlayer
 
+#Cargar un csv
 def loadCsvFile(file):
     uri = f"file://{os.getcwd()}/{file}.csv?type=csv&delimiter=,&detectTypes=no"
-    csv = QgsVectorLayer(uri, file, 'delimitedtext')
-    #QgsProject.instance().addMapLayer(muns)
-    #QgsProject.instance().addMapLayer(csv)
-    return csv
+    return QgsVectorLayer(uri, file, 'delimitedtext')
 
-def addJoinData(csv, targetFieldName):
+#Crea union de datos entre layer y csv
+def createJoinData(csv, targetFieldName):
     join = QgsVectorLayerJoinInfo()
     join.setJoinFieldName(targetFieldName)
     join.setTargetFieldName(targetFieldName)
@@ -170,17 +171,6 @@ def addJoinData(csv, targetFieldName):
     join.setUsingMemoryCache(True)
     #join.setPrefix('_')
     return join
-
-def loadTempleteQpt(file):
-    #Read qpt file
-    templateFile = open(file, 'rt')
-    templateContent = templateFile.read()
-    templateFile.close()
-
-    #Create document
-    document = QDomDocument()
-    document.setContent(templateContent)
-    return document
 
 def graduatedMethod(name):
     if (name == 'Jenks'):
@@ -190,63 +180,97 @@ def graduatedMethod(name):
     if (name == 'Quantile'):
         return QgsGraduatedSymbolRenderer.Quantile
 
+def classificationMethod(methodName):
+    return QgsApplication.classificationMethodRegistry().method(methodName)
+
 def countFeaturesByQuery(query, layer):
     layer.selectByExpression(query, QgsVectorLayer.SetSelection)
-    num = len(muns.selectedFeatures())
+    num = len(layer.selectedFeatures())
+    layer.removeSelection()
     return num
 
-def removeStopColorRamp(colorRamp):
-    newColorRamp = QgsGradientColorRamp()
-    newColorRamp.setColor1(colorRamp.color1())
-    newStops = []
-    countFinal = len(colorRamp.stops()) - 1
-    offset = 1 / countFinal
-    for i, stop in enumerate(colorRamp.stops()):
-        if i == countFinal:
-            newColorRamp.setColor2(stop.color)
-            #print('eliminar color', i, stop.offset, stop.color.name())
-        else:
-            stop.offset = offset * (i + 1)
-            newStops.append(stop)
-            #print(i, stop.offset, stop.color.name())
-    newColorRamp.setStops(newStops)
-    return newColorRamp
+def createRampByColors(colors):
+    colorRamp = QgsGradientColorRamp()
+    colorRamp.setColor1(QColor(colors[0]))
+    colorRamp.setColor2(QColor(colors[-1]))
+    offset = 1 / len(colors[1:])
+    stops = []
+    for i, color in enumerate(colors[1:-1]):
+        stops.append(QgsGradientStop(offset * (i + 1), QColor(color)))
+    colorRamp.setStops(stops)
+    return colorRamp
 
-def invertColorRamp(colorRamp, colorRampName):
+def invertColorRamp(colorRamp):
     invert = QgsGradientColorRamp()
     invert.setColor1(colorRamp.color2())
     invert.setColor2(colorRamp.color1())
     stops = colorRamp.stops().copy()
     newStops = []
-    for i in range(len(stops)):
-        #print(i, colorRamp.stops()[i].color.name(), '=>', len(stops)-i-1)
-        newStops.append(colorRamp.stops()[i])
-        newStops[i].color = stops[len(stops)-i-1].color
-        #print(stop.offset, stop.color.name())
+    for i, stop in enumerate(stops):
+        newStops.append(QgsGradientStop(stop.offset, stops[len(stops)-i-1].color))
+        #print(f'{i} ({stop.offset}:{stop.color.name()}) => ({newStops[i].offset}:{newStops[i].color.name()})')
     invert.setStops(newStops)
-    if colorRampName == 'Greens':
-        #return removeStopColorRamp(removeStopColorRamp(invert))
-        return removeStopColorRamp(removeStopColorRamp(colorRamp))
-    if colorRampName == 'Greys':
-        invert.setColor1(QColor('#333333'))
-        invert.setStops([])
-        invert.setColor2(QColor('#e0e0e0'))
     return invert
 
-def defineColorRamp(colorRampName):
+def removeStopColorRamp(colorRamp, remove, start=False):
+    newColorRamp = QgsGradientColorRamp()
+    nStops = len(colorRamp.stops()) - remove
+    if nStops < 0: nStops = 0
+    offset = round(1 / (nStops + 1), 2)
+    newStops = []
+    
+    if start:
+        for i in range(nStops):
+            #print(f'{i} ({offset * (i + 1)}:{colorRamp.stops()[i + remove].color.getRgb()})')
+            newStops.append(QgsGradientStop(offset * (i + 1), colorRamp.stops()[i + remove].color))
+        newColorRamp.setColor1(colorRamp.stops()[-nStops-1].color)
+        newColorRamp.setColor2(colorRamp.color2())
+    else:
+        for i in range(nStops):
+            #print(f'{i} ({offset * (i + 1)}:{colorRamp.stops()[i].color.getRgb()})')
+            newStops.append(QgsGradientStop(offset * (i + 1), colorRamp.stops()[i].color))
+        newColorRamp.setColor1(colorRamp.color1())
+        newColorRamp.setColor2(colorRamp.stops()[nStops].color)
+    
+    newColorRamp.setStops(newStops)
+    return newColorRamp
+
+def defineRampColor(colorRampName):
+    availableRamps = QgsStyle().defaultStyle().colorRampNames()
     if ',' in colorRampName:
-        return
-    return
+        return createRampByColors(colorRampName.split(','))
+    invert = False
+    if colorRampName.startswith('-'):
+        invert = True
+        colorRampName = colorRampName[1:]
+    remove = ''
+    if '-' in colorRampName:
+        separe = colorRampName.split('-')
+        colorRampName = separe[0]
+        remove = separe[1]
+    if colorRampName in availableRamps:
+        colorRamp = QgsStyle().defaultStyle().colorRamp(colorRampName)
+        if invert:
+            colorRamp = invertColorRamp(colorRamp)
+        if bool(remove):
+            removeStart = False
+            if remove.startswith('|'): removeStart = True
+            remove = [int(i) for i in remove.split('|') if i.isdigit()][0]
+            colorRamp = removeStopColorRamp(colorRamp, remove, removeStart)
+        return colorRamp
+    else:
+        print('La rampa de colores no existe')
+        return QgsGradientColorRamp()
 
 def addClassification(targetFieldNameData, methodName, colorRampName):
     muns.setRenderer(QgsGraduatedSymbolRenderer(targetFieldNameData))
     muns.renderer().updateClasses(muns, graduatedMethod(methodName), 5)
-    ramp = QgsStyle().defaultStyle().colorRamp(colorRampName)
-    muns.renderer().updateColorRamp(invertColorRamp(ramp, colorRampName))
+    #ramp = QgsStyle().defaultStyle().colorRamp(colorRampName)
+    muns.renderer().updateColorRamp(defineRampColor(colorRampName))
     muns.renderer().updateSymbols(QgsFillSymbol.createSimple({'outline_width': '0.05'}))
     muns.triggerRepaint()
 
-def addClasificationDefined(targetFieldNameData, classes, methodName):
+def addClassificationDefined(targetFieldNameData, classes, methodName):
     rangeList = []
     # Make our first symbol and range...
     for _class in classes:
@@ -267,8 +291,7 @@ def addClasificationDefined(targetFieldNameData, classes, methodName):
 
 def formatLegendlabel(eval):
     def format(n):
-        if '.' in n:
-            return f'{float(n):.1f}'
+        if '.' in n: return f'{float(n):.1f}'
         return n
     min = eval.split(' - ')[0]
     max = eval.split(' - ')[1]
@@ -283,9 +306,15 @@ def settingsLegend(legend, legendName):
     for i in legend.model().layerLegendNodes(legendlayer):
         i.setUserLabel((formatLegendlabel(i.evaluateLabel())))
 
-def createLayout(templeteQpt):
+def createLayoutFromTemplate(file):
+    #Read qpt file
+    templateFile = open(os.path.join(templeteFolder, file), 'rt')
+    templateContent = templateFile.read()
+    templateFile.close()
     #Create document
-    document = loadTempleteQpt(templeteQpt)
+    document = QDomDocument()
+    document.setContent(templateContent)
+    #Create layout
     layout = QgsPrintLayout(project)
     layout.initializeDefaults()
     layout.loadFromTemplate(document, QgsReadWriteContext())
@@ -293,7 +322,7 @@ def createLayout(templeteQpt):
 
 def buildImageMap(dataMap):
     #Create layout
-    layout = createLayout(dataMap['template'])
+    layout = createLayoutFromTemplate(dataMap['template'])
     ##Add Texts
     layout.itemById('title').setText(dataMap['title'])
     layout.itemById('subtitle').setText(dataMap['subtitle'])
@@ -315,11 +344,17 @@ def buildImageMap(dataMap):
     settingsLegend(legend, dataMap['legend'])
     #Logo
     logo = layout.itemById('logo')
-    logo.setPicturePath(os.path.join(base_path, 'logos', 'log_conacyt_horizontal_sin_sintagma.png'))
+    logo.setPicturePath(os.path.join(templeteFolder, 'log_conacyt_horizontal_sin_sintagma.png'))
     return layout
 
+def checkFolder(folder):
+    if os.path.isdir(folder) == False:
+        os.mkdir(folder)
+        print(f'Se ha creao la carpeta {folder}')
+
 def exportImageMap(image_name, layout):
-    image_path = os.path.join(base_path, image_name)
+    checkFolder(outputFolder)
+    image_path = os.path.join(outputFolder, image_name)
 
     #Export Image
     exporter = QgsLayoutExporter(layout)
@@ -329,13 +364,10 @@ def exportImageMap(image_name, layout):
 
 
 #Municipios
-muns = loadLayerGpkg('mun_2019.gpkg', 'mun_2019', 'Municipios')
-
+muns = loadLayerGpkg(os.path.join(templeteFolder, 'mun_2019.gpkg'), 'mun_2019', 'Municipios')
 #Estados
-edos = loadLayerGpkg('edos_2019.gpkg', 'edos_2019', 'Estados', createSymbolUnfilled(0.86))
-
-#
-base_path = os.path.join(QgsProject.instance().homePath())
+edos = loadLayerGpkg(os.path.join(templeteFolder, 'edos_2019.gpkg'), 'edos_2019', 'Estados', createSymbolUnfilled(0.86))
+#QgsProject.instance().addMapLayer(muns)
 
 
 #def createMap(dataMap):
@@ -345,29 +377,30 @@ for i, dataMap in enumerate(dataMaps):
 
     #Prepare data in layer
     csv = loadCsvFile(dataMap['file'])
-    join = addJoinData(csv, dataMap['targetFieldName'])
+    join = createJoinData(csv, dataMap['targetFieldName'])
     muns.addJoin(join)
 
-    #Add Clasification
-    targetFieldNameData = f"{dataMap['file']}_{dataMap['variant']}"
-    print(targetFieldNameData)
-    
-    for methodName in dataMap['methods'].split(','):
-        addClassification(targetFieldNameData, methodName, dataMap['colorRamp'])
-
-        #Instance Iamage Path
-        image_name = f"{i+1}_{dataMap['file']}_{methodName}.png"
-        exportImageMap(image_name, buildImageMap(dataMap))
+    #Add variants
+    for variant in dataMap['variants'].split(','):
+        targetFieldNameData = f"{dataMap['file']}_{variant}"
+        #targetFieldNameData = f"{dataMap['file']}_{dataMap['variant']}"
+        print(targetFieldNameData)
         
-    if 'classes' in dataMap.keys() and dataMap['classes']:
         for methodName in dataMap['methods'].split(','):
-            addClasificationDefined(targetFieldNameData, dataMap['classes'], methodName)
+            #Add Clasification
+            addClassification(targetFieldNameData, methodName, dataMap['colorRamp'])
 
             #Instance Iamage Path
-            image_name = f"{i+1}_{dataMap['file']}_{methodName}_classes.png"
+            image_name = f"{i+1}_{dataMap['file']}_{methodName}.png"
             exportImageMap(image_name, buildImageMap(dataMap))
+            
+        if 'classes' in dataMap.keys() and dataMap['classes']:
+            for methodName in dataMap['methods'].split(','):
+                addClassificationDefined(targetFieldNameData, dataMap['classes'], methodName)
 
-
+                #Instance Iamage Path
+                image_name = f"{i+1}_{dataMap['file']}_{methodName}_classes.png"
+                exportImageMap(image_name, buildImageMap(dataMap))
 
     muns.removeJoin(join.joinLayerId())
     
