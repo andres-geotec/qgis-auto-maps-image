@@ -10,9 +10,9 @@ dataMaps = [{
     'file': 'resultado_ingreso_ambulatorios_semanas',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas no hospitalizadas',
-    'date': '02 de Diciembre de 2020',
+    'date': '16 de Diciembre de 2020',
     'note': 'Días promedio desde "FECHA_INGRESO" a "FECHA_RESULTADO", agrupado por municipio y semana epidemiológica. En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
-    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201216COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalariaGif.qpt'
@@ -20,19 +20,20 @@ dataMaps = [{
     'file': 'resultado_ingreso_hospitalizados_semanas',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas hospitalizadas',
-    'date': '02 de Diciembre de 2020',
+    'date': '16 de Diciembre de 2020',
     'note': 'Días promedio desde "FECHA_INGRESO" a "FECHA_RESULTADO", agrupado por municipio y semana epidemiológica. En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
-    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201216COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalariaGif.qpt'
 }]
 
-semanas = ['10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47']
+semanas = ['10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49']
 
 
 #Instance path proyect application
-path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/201202COVID19MEXICOTOT/'
+path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/201216COVID19MEXICOTOT/'
+templeteFolder = 'templetes'
 os.chdir(path)
 project = QgsProject()
 
@@ -163,7 +164,7 @@ def getTextDateRangesByWeek(weekNumber):
 #Municipios
 munsBackground = loadLayerGpkg(os.path.join(templeteFolder, 'mun_2019.gpkg'), 'mun_2019', 'Sin ingresos', 
     QgsFillSymbol.createSimple({'outline_width': '0.05', 'color': '255,255,255,255'}))
-muns = loadLayerGpkg(os.path.join(templeteFolder, 'mun_2019.gpkg'), 'mun_2019', 'Municipios')
+muns = loadLayerGpkg(os.path.join(templeteFolder, 'mun_2019.gpkg'), 'mun_2019', 'Días Promedio')
 
 #Estados
 edos = loadLayerGpkg(os.path.join(templeteFolder, 'edos_2019.gpkg'), 'edos_2019', 'Estados', createSymbol(0.86, '0,0,0,255'))

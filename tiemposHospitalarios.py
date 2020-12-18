@@ -5,19 +5,20 @@ import os
 
 
 #Instance path proyect application
-path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/201202COVID19MEXICOTOT/'
+path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/201216COVID19MEXICOTOT/'
 outputFolder = 'image-maps'
 templeteFolder = 'templetes'
 os.chdir(path)
 project = QgsProject()
 
 dataMaps = [{
-    'file': "ingreso_sintomas_todos",
+    'group': 1,
+    'file': 'ingreso_sintomas_todos',
     'title': 'Accesibilidad hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de síntomas e ingreso',
-    'date': '02 de Diciembre de 2020',
+    'date': '16 de Diciembre de 2020',
     'note': "Promedio municipal de días desde 'FECHA_SINTOMAS' a 'FECHA_INGRESO'. Para los municipios con menos de 3 casos positivos se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201216COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'variants': 'tiempo_ingreso_sintomas',
     'targetFieldName': 'cvegeomun',
@@ -26,12 +27,13 @@ dataMaps = [{
     'methods': 'Jenks,Quantile',
     'classes': ''
 }, {
+    'group': 2,
     'file': 'resultado_ingreso_todes',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado',
-    'date': '02 de Diciembre de 2020',
+    'date': '16 de Diciembre de 2020',
     'note': "Promedio municipal de días desde 'FECHA_INGRESO' a 'FECHA_RESULTADO'. Para los municipios con menos de 3 casos positivos se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201216COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'variants': 'tiempo_resultado_ingreso',
     'targetFieldName': 'cvegeomun',
@@ -40,12 +42,13 @@ dataMaps = [{
     'methods': 'Jenks,Quantile',
     'classes': ''
 }, {
+    'group': 3,
     'file': 'alta_ingreso_hospitalizados',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y alta',
-    'date': '02 de Diciembre de 2020',
+    'date': '16 de Diciembre de 2020',
     'note': "Promedio municipal de días desde 'FECHA_INGRESO' a 'FECHA_ALTA' (estimada). Para los municipios con menos de 3 hospitalizaciones se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201216COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'variants': 'tiempo_alta_ingreso',
     'targetFieldName': 'cvegeomun',
@@ -54,12 +57,13 @@ dataMaps = [{
     'methods': 'Jenks,Quantile',
     'classes': ''
 }, {
+    'group': 4,
     'file': 'defuncion_ingreso_fallecidos',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y defunción',
-    'date': '02 de Diciembre de 2020',
+    'date': '16 de Diciembre de 2020',
     'note': "Promedio municipal de días desde 'FECHA_INGRESO' a 'FECHA_DEF' (estimada). Para los municipios con menos de 3 defunciones se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201216COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'variants': 'tiempo_defuncion_ingreso',
     'targetFieldName': 'cvegeomun',
@@ -68,12 +72,13 @@ dataMaps = [{
     'methods': 'Jenks,Quantile',
     'classes': ''
 }, {
+    'group': 5,
     'file': 'alta_resultado_hospitalizados',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de resultado y alta',
-    'date': '02 de Diciembre de 2020',
+    'date': '16 de Diciembre de 2020',
     'note': "Promedio municipal de días desde 'FECHA_RESULTADO' a 'FECHA_ALTA' (estimada). Para los municipios con menos de 3 hospitalizaciones se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201216COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'variants': 'tiempo_alta_resultado',
     'targetFieldName': 'cvegeomun',
@@ -82,12 +87,13 @@ dataMaps = [{
     'methods': 'Jenks,Quantile',
     'classes': ''
 }, {
+    'group': 6,
     'file': 'defuncion_resultado_fallecidos',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de resultado y defunción',
-    'date': '02 de Diciembre de 2020',
+    'date': '16 de Diciembre de 2020',
     'note': "Promedio municipal de días desde 'FECHA_RESULTADO' a 'FECHA_DEF' (estimada). Para los municipios con menos de 3 defunciones se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201216COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'variants': 'tiempo_defuncion_resultado',
     'targetFieldName': 'cvegeomun',
@@ -96,12 +102,13 @@ dataMaps = [{
     'methods': 'Jenks,Quantile',
     'classes': ''
 }, {
+    'group': 7,
     'file': 'resultado_ingreso_ambulatorios',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas no hospitalizadas',
-    'date': '02 de Diciembre de 2020',
+    'date': '16 de Diciembre de 2020',
     'note': 'Promedio municipal de días desde "FECHA_INGRESO" a "FECHA_RESULTADO". En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
-    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201216COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'variants': 'tiempo_resultado_ingreso',
     'targetFieldName': 'cvegeomun',
@@ -109,19 +116,20 @@ dataMaps = [{
     'colorRamp': '-RdYlGn',
     'methods': 'Jenks',
     'classes': [
-        {'min':'<', 'max':1,'color':'#1a9641','label':'< - 1'},
-        {'min':1, 'max':3,'color':'#a6d96a','label':'1.1 - 3'},
-        {'min':3, 'max':5,'color':'#ffffc0','label':'3.1 - 5'},
-        {'min':5, 'max':8,'color':'#fdae61','label':'5.1 - 8'},
-        {'min':8, 'max':'>','color':'#d7191c','label':'8.1 - >'}
+        {'min':-13.2, 'max':1,'color':'#1a9641','label':'13.2 - 1'},
+        {'min':1, 'max':3,'color':'#a6d96a','label':'1 - 3'},
+        {'min':3, 'max':5,'color':'#ffffc0','label':'3 - 5'},
+        {'min':5, 'max':8,'color':'#fdae61','label':'5 - 8'},
+        {'min':8, 'max':99,'color':'#d7191c','label':'8 - 99'}
     ]
 }, {
+    'group': 8,
     'file': 'resultado_ingreso_hospitalizados',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas hospitalizadas',
-    'date': '02 de Diciembre de 2020',
+    'date': '16 de Diciembre de 2020',
     'note': 'Promedio municipal de días desde "FECHA_INGRESO" a "FECHA_RESULTADO". En los municipios con menos de 3 hospitalizaciones se utilizó el promedio por jurisdicción sanitaria.',
-    'source': 'Secretaría de Salud: "201202COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201216COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'variants': 'tiempo_resultado_ingreso',
     'targetFieldName': 'cvegeomun',
@@ -130,10 +138,10 @@ dataMaps = [{
     'methods': 'Jenks',
     'classes': [
         {'min':-0.3, 'max':1,'color':'#1a9641','label':'-0.3 - 1'},
-        {'min':1, 'max':3,'color':'#a6d96a','label':'1.1 - 3'},
-        {'min':3, 'max':5,'color':'#ffffc0','label':'3.1 - 5'},
-        {'min':5, 'max':8,'color':'#fdae61','label':'5.1 - 8'},
-        {'min':8, 'max':58,'color':'#d7191c','label':'8.1 - 57'}
+        {'min':1, 'max':3,'color':'#a6d96a','label':'1 - 3'},
+        {'min':3, 'max':5,'color':'#ffffc0','label':'3 - 5'},
+        {'min':5, 'max':8,'color':'#fdae61','label':'5 - 8'},
+        {'min':8, 'max':58,'color':'#d7191c','label':'8 - 10'}
     ]
 }]
 
@@ -317,6 +325,7 @@ def addClassificationDefined(targetFieldNameData, classes, methodName):
         color = QtGui.QColor(_class['color'])
         symbol = QgsSymbol.defaultSymbol(muns.geometryType())
         symbol.setColor(color)
+        #_range = QgsRendererRange(_class['min'], _class['max'], symbol, _class['label'])
         _range = QgsRendererRange(_class['min'], _class['max'], symbol, _class['label'])
         rangeList.append(_range)
     
@@ -411,9 +420,9 @@ edos = loadLayerGpkg(os.path.join(templeteFolder, 'edos_2019.gpkg'), 'edos_2019'
 
 #def createMap(dataMap):
 #for dataMap in dataMaps[:2]:
-for i, dataMap in enumerate(dataMaps):
+for dataMap in dataMaps:
     ant = 0
-    print(i+1, 'Creando mapa', dataMap['file'])
+    print(dataMap['group'], 'Creando mapa', dataMap['file'])
 
     #Prepare data in layer
     csv = loadCsvFile(dataMap['file'])
@@ -431,7 +440,7 @@ for i, dataMap in enumerate(dataMaps):
             addClassification(targetFieldNameData, methodName, dataMap['colorRamp'])
 
             #Instance Iamage Path
-            image_name = f"{i+1}_{dataMap['file']}_{methodName}.png"
+            image_name = f"{dataMap['group']}_{dataMap['file']}_{methodName}.png"
             exportImageMap(image_name, buildImageMap(dataMap))
             
         if 'classes' in dataMap.keys() and dataMap['classes']:
@@ -439,7 +448,7 @@ for i, dataMap in enumerate(dataMaps):
                 addClassificationDefined(targetFieldNameData, dataMap['classes'], methodName)
 
                 #Instance Iamage Path
-                image_name = f"{i+1}_{dataMap['file']}_{methodName}_classes.png"
+                image_name = f"{dataMap['group']}_{dataMap['file']}_{methodName}_classes.png"
                 exportImageMap(image_name, buildImageMap(dataMap))
 
     muns.removeJoin(join.joinLayerId())
