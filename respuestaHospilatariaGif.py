@@ -10,9 +10,9 @@ dataMaps = [{
     'file': 'resultado_ingreso_ambulatorios_semanas',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas no hospitalizadas',
-    'date': '16 de Diciembre de 2020',
+    'date': '23 de Diciembre de 2020',
     'note': 'Días promedio desde "FECHA_INGRESO" a "FECHA_RESULTADO", agrupado por municipio y semana epidemiológica. En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
-    'source': 'Secretaría de Salud: "201216COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201223COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalariaGif.qpt'
@@ -20,19 +20,19 @@ dataMaps = [{
     'file': 'resultado_ingreso_hospitalizados_semanas',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas hospitalizadas',
-    'date': '16 de Diciembre de 2020',
+    'date': '23 de Diciembre de 2020',
     'note': 'Días promedio desde "FECHA_INGRESO" a "FECHA_RESULTADO", agrupado por municipio y semana epidemiológica. En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
-    'source': 'Secretaría de Salud: "201216COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "201223COVID19MEXICOTOT" de la Dirección General de Epidemiología',
     'legend': 'Días Promedio',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalariaGif.qpt'
 }]
 
-semanas = ['10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49']
+semanas = ['10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50']
 
 
 #Instance path proyect application
-path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/201216COVID19MEXICOTOT/'
+path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/201223COVID19MEXICOTOT/'
 templeteFolder = 'templetes'
 os.chdir(path)
 project = QgsProject()
