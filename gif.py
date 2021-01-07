@@ -1,7 +1,7 @@
 from PIL import Image
 import os
 
-path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/201223COVID19MEXICOTOT/forGifs'
+path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/201230COVID19MEXICOTOT/forGifs'
 names = ['0_resultado_ingreso_ambulatorios','1_resultado_ingreso_hospitalizados']
 images = []
 
@@ -12,7 +12,7 @@ def lowerImageResolution(img, percent):
     return im.resize((getPercent(w, percent), getPercent(h, percent)))
 for name in names:
     #image_name = '1_resultado_ingreso_hospitalizados_semanas_{}_Jenks.png'
-    for i in range(10, 51):
+    for i in range(10, 52):
         image_path = os.path.join(path, f'{name}_semanas_{i}_Jenks.png')
         im = Image.open(image_path)
         images.append(lowerImageResolution(im, 19))
