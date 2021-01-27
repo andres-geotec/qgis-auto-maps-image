@@ -5,37 +5,46 @@ from datetime import datetime
 import os
 
 methods = ['Jenks']
+PATHMAIN = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria'
+#now = datetime.today()
+now = datetime(2021,1,20)
+path = os.path.join(PATHMAIN, '{}COVID19MEXICOTOT'.format(str(now).replace('-','')[2:8]))
 
 dataMaps = [{
     'file': 'resultado_ingreso_ambulatorios_semanas',
-    'title': 'Respuesta hospitalaria',
+    'title': 'Respuesta hospitalaria (ambulatorios)',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas no hospitalizadas',
-    'date': '06 de Enero de 2021',
+    'date': '20 de Enero de 2021',
     'note': 'Días promedio desde "FECHA_INGRESO" a "FECHA_RESULTADO", agrupado por municipio y semana epidemiológica. En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
-    'source': 'Secretaría de Salud: "210106COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "{}COVID19MEXICOTOT" de la Dirección General de Epidemiología.'.format(str(now).replace('-','')[2:8]),
     'legend': 'Días Promedio',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalariaGif.qpt'
 }, {
     'file': 'resultado_ingreso_hospitalizados_semanas',
-    'title': 'Respuesta hospitalaria',
+    'title': 'Respuesta hospitalaria (no ambulatorios)',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas hospitalizadas',
-    'date': '06 de Enero de 2021',
+    'date': '20 de Enero de 2021',
     'note': 'Días promedio desde "FECHA_INGRESO" a "FECHA_RESULTADO", agrupado por municipio y semana epidemiológica. En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
-    'source': 'Secretaría de Salud: "210106COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "{}COVID19MEXICOTOT" de la Dirección General de Epidemiología.'.format(str(now).replace('-','')[2:8]),
     'legend': 'Días Promedio',
     'targetFieldName': 'cvegeomun',
     'template': 'respuestaHospitalariaGif.qpt'
 }]
 
-semanas = ['10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52']
+semanas = range(10, 56)
 
 
 #Instance path proyect application
-path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/210106COVID19MEXICOTOT/'
+#path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/210120COVID19MEXICOTOT/'
 templeteFolder = 'templetes'
 os.chdir(path)
 project = QgsProject()
+
+def checkFolder(folder):
+    if os.path.isdir(folder) == False:
+        os.mkdir(folder)
+        print(f'Se ha creao la carpeta {folder}')
 
 def createSymbol(outlineWidth, fillColor):
     return QgsFillSymbol.createSimple({
@@ -227,6 +236,8 @@ for i, dataMap in enumerate(dataMaps):
             logo.setPicturePath(os.path.join(templeteFolder, 'log_conacyt_horizontal_sin_sintagma.png'))
             #logo.setSvgFillColor(QColor('#002663'))
 
+            checkFolder('forGifs')
+
             #Instance Iamage Path
             image_name = f"{i}_{dataMap['file']}_{semana}_{methodName}.png"
             image_path = os.path.join(base_path, 'forGifs', image_name)
@@ -237,6 +248,38 @@ for i, dataMap in enumerate(dataMaps):
 
             print('Mapa generado', image_name)
     muns.removeJoin(join.joinLayerId())
+    #QgsProject.instance().addMapLayer(muns)
+    #QgsProject.instance().addMapLayer(csv)
     
 #createMap(dataMaps[0])
+print('*** Proceso finalizado ***')
+
+print('*** Haciendo Gifs!!! ***')
+
+from PIL import Image
+import os
+
+path = os.path.join(path, 'forGifs')
+names = ['0_resultado_ingreso_ambulatorios','1_resultado_ingreso_hospitalizados']
+images = []
+
+def lowerImageResolution(img, percent):
+    def getPercent(n, percent):
+        return int(n*(percent/100))
+    w, h = im.size
+    return im.resize((getPercent(w, percent), getPercent(h, percent)))
+for name in names:
+    #image_name = '1_resultado_ingreso_hospitalizados_semanas_{}_Jenks.png'
+    for i in semanas:
+        image_path = os.path.join(path, f'{name}_semanas_{i}_Jenks.png')
+        im = Image.open(image_path)
+        images.append(lowerImageResolution(im, 19))
+        print('load', image_path)
+
+
+    print('creando gif de', len(images), 'imagenes')
+    images[0].save(os.path.join(path, f'{name}.gif'), save_all=True, append_images=images[1:], optimize=False, duration=850, loop=0)
+    print(name, 'Finalizado.')
+    images = []
+
 print('*** Proceso finalizado ***')

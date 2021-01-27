@@ -1,11 +1,16 @@
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.PyQt import QtGui
 from qgis.utils import iface
+from datetime import datetime
 import os
 
 
 #Instance path proyect application
-path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/210106COVID19MEXICOTOT/'
+PATHMAIN = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria'
+#now = datetime.today()
+now = datetime(2021,1,20)
+path = os.path.join(PATHMAIN, '{}COVID19MEXICOTOT'.format(str(now).replace('-','')[2:8]))
+#path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/210120COVID19MEXICOTOT/'
 outputFolder = 'image-maps'
 templeteFolder = 'templetes'
 os.chdir(path)
@@ -16,9 +21,9 @@ dataMaps = [{
     'file': 'ingreso_sintomas_todos',
     'title': 'Accesibilidad hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de síntomas e ingreso',
-    'date': '06 de Enero de 2021',
+    'date': f"{now.day} de {now.strftime('%B').title()} de {now.year}",
     'note': "Promedio municipal de días desde 'FECHA_SINTOMAS' a 'FECHA_INGRESO'. Para los municipios con menos de 3 casos positivos se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "210106COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "{}COVID19MEXICOTOT" de la Dirección General de Epidemiología'.format(str(now).replace('-','')[2:8]),
     'legend': 'Días Promedio',
     'variants': 'tiempo_ingreso_sintomas',
     'targetFieldName': 'cvegeomun',
@@ -31,9 +36,9 @@ dataMaps = [{
     'file': 'resultado_ingreso_todes',
     'title': 'Respuesta hospitalaria',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado',
-    'date': '06 de Enero de 2021',
+    'date': f"{now.day} de {now.strftime('%B').title()} de {now.year}",
     'note': "Promedio municipal de días desde 'FECHA_INGRESO' a 'FECHA_RESULTADO'. Para los municipios con menos de 3 casos positivos se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "210106COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "{}COVID19MEXICOTOT" de la Dirección General de Epidemiología'.format(str(now).replace('-','')[2:8]),
     'legend': 'Días Promedio',
     'variants': 'tiempo_resultado_ingreso',
     'targetFieldName': 'cvegeomun',
@@ -44,11 +49,11 @@ dataMaps = [{
 }, {
     'group': 3,
     'file': 'alta_ingreso_hospitalizados',
-    'title': 'Respuesta hospitalaria',
+    'title': 'Periodo de atención (recuperados)',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y alta',
-    'date': '06 de Enero de 2021',
+    'date': f"{now.day} de {now.strftime('%B').title()} de {now.year}",
     'note': "Promedio municipal de días desde 'FECHA_INGRESO' a 'FECHA_ALTA' (estimada). Para los municipios con menos de 3 hospitalizaciones se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "210106COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "{}COVID19MEXICOTOT" de la Dirección General de Epidemiología'.format(str(now).replace('-','')[2:8]),
     'legend': 'Días Promedio',
     'variants': 'tiempo_alta_ingreso',
     'targetFieldName': 'cvegeomun',
@@ -59,11 +64,11 @@ dataMaps = [{
 }, {
     'group': 4,
     'file': 'defuncion_ingreso_fallecidos',
-    'title': 'Respuesta hospitalaria',
+    'title': 'Periodo de atención (defunciones)',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y defunción',
-    'date': '06 de Enero de 2021',
+    'date': f"{now.day} de {now.strftime('%B').title()} de {now.year}",
     'note': "Promedio municipal de días desde 'FECHA_INGRESO' a 'FECHA_DEF' (estimada). Para los municipios con menos de 3 defunciones se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "210106COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "{}COVID19MEXICOTOT" de la Dirección General de Epidemiología'.format(str(now).replace('-','')[2:8]),
     'legend': 'Días Promedio',
     'variants': 'tiempo_defuncion_ingreso',
     'targetFieldName': 'cvegeomun',
@@ -74,11 +79,11 @@ dataMaps = [{
 }, {
     'group': 5,
     'file': 'alta_resultado_hospitalizados',
-    'title': 'Respuesta hospitalaria',
+    'title': 'Entrega de resultados (recuperados)',
     'subtitle': 'Tiempo promedio entre fecha de resultado y alta',
-    'date': '06 de Enero de 2021',
+    'date': f"{now.day} de {now.strftime('%B').title()} de {now.year}",
     'note': "Promedio municipal de días desde 'FECHA_RESULTADO' a 'FECHA_ALTA' (estimada). Para los municipios con menos de 3 hospitalizaciones se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "210106COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "{}COVID19MEXICOTOT" de la Dirección General de Epidemiología'.format(str(now).replace('-','')[2:8]),
     'legend': 'Días Promedio',
     'variants': 'tiempo_alta_resultado',
     'targetFieldName': 'cvegeomun',
@@ -89,11 +94,11 @@ dataMaps = [{
 }, {
     'group': 6,
     'file': 'defuncion_resultado_fallecidos',
-    'title': 'Respuesta hospitalaria',
+    'title': 'Entrega de resultados (defunciones)',
     'subtitle': 'Tiempo promedio entre fecha de resultado y defunción',
-    'date': '06 de Enero de 2021',
+    'date': f"{now.day} de {now.strftime('%B').title()} de {now.year}",
     'note': "Promedio municipal de días desde 'FECHA_RESULTADO' a 'FECHA_DEF' (estimada). Para los municipios con menos de 3 defunciones se utilizó el promedio por jurisdicción sanitaria.",
-    'source': 'Secretaría de Salud: "210106COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "{}COVID19MEXICOTOT" de la Dirección General de Epidemiología'.format(str(now).replace('-','')[2:8]),
     'legend': 'Días Promedio',
     'variants': 'tiempo_defuncion_resultado',
     'targetFieldName': 'cvegeomun',
@@ -104,11 +109,11 @@ dataMaps = [{
 }, {
     'group': 7,
     'file': 'resultado_ingreso_ambulatorios',
-    'title': 'Respuesta hospitalaria',
+    'title': 'Respuesta hospitalaria (ambulatorios)',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas no hospitalizadas',
-    'date': '06 de Enero de 2021',
+    'date': f"{now.day} de {now.strftime('%B').title()} de {now.year}",
     'note': 'Promedio municipal de días desde "FECHA_INGRESO" a "FECHA_RESULTADO". En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
-    'source': 'Secretaría de Salud: "210106COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "{}COVID19MEXICOTOT" de la Dirección General de Epidemiología'.format(str(now).replace('-','')[2:8]),
     'legend': 'Días Promedio',
     'variants': 'tiempo_resultado_ingreso',
     'targetFieldName': 'cvegeomun',
@@ -125,11 +130,11 @@ dataMaps = [{
 }, {
     'group': 8,
     'file': 'resultado_ingreso_hospitalizados',
-    'title': 'Respuesta hospitalaria',
+    'title': 'Respuesta hospitalaria (ambulatorios)',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas hospitalizadas',
-    'date': '06 de Enero de 2021',
+    'date': f"{now.day} de {now.strftime('%B').title()} de {now.year}",
     'note': 'Promedio municipal de días desde "FECHA_INGRESO" a "FECHA_RESULTADO". En los municipios con menos de 3 hospitalizaciones se utilizó el promedio por jurisdicción sanitaria.',
-    'source': 'Secretaría de Salud: "210106COVID19MEXICOTOT" de la Dirección General de Epidemiología',
+    'source': 'Secretaría de Salud: "{}COVID19MEXICOTOT" de la Dirección General de Epidemiología'.format(str(now).replace('-','')[2:8]),
     'legend': 'Días Promedio',
     'variants': 'tiempo_resultado_ingreso',
     'targetFieldName': 'cvegeomun',
