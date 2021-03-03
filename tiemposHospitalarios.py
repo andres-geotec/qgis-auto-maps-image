@@ -7,8 +7,8 @@ import os
 
 #Instance path proyect application
 PATHMAIN = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria'
-#now = datetime.today()
-now = datetime(2021,1,20)
+now = datetime.today()
+#now = datetime(2021,2,10)
 path = os.path.join(PATHMAIN, '{}COVID19MEXICOTOT'.format(str(now).replace('-','')[2:8]))
 #path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/210120COVID19MEXICOTOT/'
 outputFolder = 'image-maps'
@@ -121,7 +121,7 @@ dataMaps = [{
     'colorRamp': '-RdYlGn',
     'methods': 'Jenks',
     'classes': [
-        {'min':-13.2, 'max':1,'color':'#1a9641','label':'13.2 - 1'},
+        {'min':-13.2, 'max':1,'color':'#1a9641','label':'-13.2 - 1'},
         {'min':1, 'max':3,'color':'#a6d96a','label':'1 - 3'},
         {'min':3, 'max':5,'color':'#ffffc0','label':'3 - 5'},
         {'min':5, 'max':8,'color':'#fdae61','label':'5 - 8'},
@@ -130,7 +130,7 @@ dataMaps = [{
 }, {
     'group': 8,
     'file': 'resultado_ingreso_hospitalizados',
-    'title': 'Respuesta hospitalaria (ambulatorios)',
+    'title': 'Respuesta hospitalaria (no ambulatorios)',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas hospitalizadas',
     'date': f"{now.day} de {now.strftime('%B').title()} de {now.year}",
     'note': 'Promedio municipal de días desde "FECHA_INGRESO" a "FECHA_RESULTADO". En los municipios con menos de 3 hospitalizaciones se utilizó el promedio por jurisdicción sanitaria.',

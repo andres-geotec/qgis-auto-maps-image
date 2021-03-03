@@ -6,15 +6,16 @@ import os
 
 methods = ['Jenks']
 PATHMAIN = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria'
-#now = datetime.today()
-now = datetime(2021,1,20)
+now = datetime.today()
+#now = datetime(2021,1,20)
 path = os.path.join(PATHMAIN, '{}COVID19MEXICOTOT'.format(str(now).replace('-','')[2:8]))
+semanas = range(10, 60)
 
 dataMaps = [{
     'file': 'resultado_ingreso_ambulatorios_semanas',
     'title': 'Respuesta hospitalaria (ambulatorios)',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas no hospitalizadas',
-    'date': '20 de Enero de 2021',
+    'date': f"{now.day} de {now.strftime('%B').title()} de {now.year}",
     'note': 'Días promedio desde "FECHA_INGRESO" a "FECHA_RESULTADO", agrupado por municipio y semana epidemiológica. En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
     'source': 'Secretaría de Salud: "{}COVID19MEXICOTOT" de la Dirección General de Epidemiología.'.format(str(now).replace('-','')[2:8]),
     'legend': 'Días Promedio',
@@ -24,7 +25,7 @@ dataMaps = [{
     'file': 'resultado_ingreso_hospitalizados_semanas',
     'title': 'Respuesta hospitalaria (no ambulatorios)',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas hospitalizadas',
-    'date': '20 de Enero de 2021',
+    'date': f"{now.day} de {now.strftime('%B').title()} de {now.year}",
     'note': 'Días promedio desde "FECHA_INGRESO" a "FECHA_RESULTADO", agrupado por municipio y semana epidemiológica. En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
     'source': 'Secretaría de Salud: "{}COVID19MEXICOTOT" de la Dirección General de Epidemiología.'.format(str(now).replace('-','')[2:8]),
     'legend': 'Días Promedio',
@@ -32,7 +33,6 @@ dataMaps = [{
     'template': 'respuestaHospitalariaGif.qpt'
 }]
 
-semanas = range(10, 56)
 
 
 #Instance path proyect application
