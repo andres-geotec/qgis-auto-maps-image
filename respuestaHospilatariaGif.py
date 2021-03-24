@@ -2,14 +2,15 @@ from qgis.PyQt.QtXml import QDomDocument
 from qgis.PyQt import QtGui
 from qgis.utils import iface
 from datetime import datetime
+from PIL import Image
 import os
 
 methods = ['Jenks']
 PATHMAIN = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria'
-now = datetime.today()
-#now = datetime(2021,1,20)
+#now = datetime.today()
+now = datetime(2021,1,13)
 path = os.path.join(PATHMAIN, '{}COVID19MEXICOTOT'.format(str(now).replace('-','')[2:8]))
-semanas = range(10, 60)
+print(now)
 
 dataMaps = [{
     'file': 'resultado_ingreso_ambulatorios_semanas',
@@ -169,6 +170,12 @@ def getTextDateRangesByWeek(weekNumber):
         label += f" de {ini.strftime('%B')}"
     return f"({label} al {fin.day:02d} de {fin.strftime('%B')})"
 
+# Baja la resolución de la imagen
+def lowerImageResolution(img, percent):
+    def getPercent(n, percent):
+        return int(n*(percent/100))
+    w, h = im.size
+    return im.resize((getPercent(w, percent), getPercent(h, percent)))
 
 #Municipios
 munsBackground = loadLayerGpkg(os.path.join(templeteFolder, 'mun_2019.gpkg'), 'mun_2019', 'Sin ingresos', 
@@ -182,6 +189,7 @@ edos = loadLayerGpkg(os.path.join(templeteFolder, 'edos_2019.gpkg'), 'edos_2019'
 #def createMap(dataMap):
 #for dataMap in dataMaps[:2]:
 for i, dataMap in enumerate(dataMaps):
+    #if i: continue
     print(i, 'Creando mapa', dataMap['file'])
 
     #Prepare data in layer
@@ -189,7 +197,12 @@ for i, dataMap in enumerate(dataMaps):
     join = createJoinData(csv, dataMap['targetFieldName'])
     muns.addJoin(join)
 
-    #for semana in semanas[-5:]:
+    cols = [k.name() for k in csv.fields()]
+    #print('columnas: ' + str(cols))
+    semanas = cols[cols.index('10'):-2]#[40:47]
+    print('semanas: ' + str(semanas))
+    images = []
+
     for semana in semanas:
         #Add Clasification
         targetFieldNameData = f"{dataMap['file']}_{semana}"
@@ -208,8 +221,15 @@ for i, dataMap in enumerate(dataMaps):
             layout.itemById('date').setText(dataMap['date'])
             layout.itemById('note').setText(dataMap['note'])
             layout.itemById('source').setText(dataMap['source'])
-            layout.itemById('semana_title').setText(f'Semana Epidemiológica {semana}')
-            layout.itemById('semana_rango').setText(getTextDateRangesByWeek(semana))
+            layout.itemById('semana_rango').setText(getTextDateRangesByWeek(int(semana)))
+            if '54' in semanas:
+                # Los reportes posteriores al 210120 se imprimen con año
+                layout.itemById('semana_title').setText(
+                    f'Semana Epidemiológica {f"{semana} (2020)" if int(semana)<54 else f"{int(semana)-53} (2021)"}')
+            else:
+                # Los reportes anteriores al 210120 no se imprimen con año
+                layout.itemById('semana_title').setText(f'Semana Epidemiológica {semana}')
+            
 
             ##Add Map main
             map = layout.itemById('map')
@@ -245,22 +265,30 @@ for i, dataMap in enumerate(dataMaps):
             #Export Image
             exporter = QgsLayoutExporter(layout)
             exporter.exportToImage(image_path, QgsLayoutExporter.ImageExportSettings())
+            im = Image.open(image_path)
+            images.append(lowerImageResolution(im, 19))
+            print('load', image_path)
 
             print('Mapa generado', image_name)
     muns.removeJoin(join.joinLayerId())
     #QgsProject.instance().addMapLayer(muns)
     #QgsProject.instance().addMapLayer(csv)
+
+    print('creando gif de', len(images), 'imagenes')
+    images[0].save(os.path.join(base_path, 'forGifs', f'{i}_{dataMap["file"]}.gif'), save_all=True, 
+        append_images=images[1:], optimize=False, duration=1000, loop=0)
+    print(f'{i}_{dataMap["file"]}.gif', 'Finalizado.')
     
 #createMap(dataMaps[0])
 print('*** Proceso finalizado ***')
-
+'''
 print('*** Haciendo Gifs!!! ***')
 
 from PIL import Image
 import os
 
 path = os.path.join(path, 'forGifs')
-names = ['0_resultado_ingreso_ambulatorios','1_resultado_ingreso_hospitalizados']
+names = ['0_resultado_ingreso_ambulatorios']#,'1_resultado_ingreso_hospitalizados']
 images = []
 
 def lowerImageResolution(img, percent):
@@ -270,16 +298,18 @@ def lowerImageResolution(img, percent):
     return im.resize((getPercent(w, percent), getPercent(h, percent)))
 for name in names:
     #image_name = '1_resultado_ingreso_hospitalizados_semanas_{}_Jenks.png'
-    for i in semanas:
-        image_path = os.path.join(path, f'{name}_semanas_{i}_Jenks.png')
+    for semana in semanas[40:50]:
+        image_path = os.path.join(path, f'{name}_semanas_{semana}_Jenks.png')
         im = Image.open(image_path)
         images.append(lowerImageResolution(im, 19))
         print('load', image_path)
 
 
     print('creando gif de', len(images), 'imagenes')
-    images[0].save(os.path.join(path, f'{name}.gif'), save_all=True, append_images=images[1:], optimize=False, duration=850, loop=0)
+    images[0].save(os.path.join(path, f'{name}.gif'), save_all=True, 
+        append_images=images[1:], optimize=False, duration=1000, loop=0)
     print(name, 'Finalizado.')
     images = []
 
 print('*** Proceso finalizado ***')
+'''
