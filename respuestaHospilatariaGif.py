@@ -7,8 +7,8 @@ import os
 
 methods = ['Jenks']
 PATHMAIN = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria'
-#now = datetime.today()
-now = datetime(2021,1,13)
+now = datetime.today()
+#now = datetime(2021,1,13)
 path = os.path.join(PATHMAIN, '{}COVID19MEXICOTOT'.format(str(now).replace('-','')[2:8]))
 print(now)
 

@@ -49,7 +49,7 @@ dataMaps = [{
 }, {
     'group': 3,
     'file': 'alta_ingreso_hospitalizados',
-    'title': 'Periodo de atención (recuperados)',
+    'title': 'Periodo de atención (recuperados hospitalizados)',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y alta',
     'date': f"{now.day} de {now.strftime('%B').title()} de {now.year}",
     'note': "Promedio municipal de días desde 'FECHA_INGRESO' a 'FECHA_ALTA' (estimada). Para los municipios con menos de 3 hospitalizaciones se utilizó el promedio por jurisdicción sanitaria.",
@@ -79,7 +79,7 @@ dataMaps = [{
 }, {
     'group': 5,
     'file': 'alta_resultado_hospitalizados',
-    'title': 'Entrega de resultados (recuperados)',
+    'title': 'Entrega de resultados (recuperados hospitalizados)',
     'subtitle': 'Tiempo promedio entre fecha de resultado y alta',
     'date': f"{now.day} de {now.strftime('%B').title()} de {now.year}",
     'note': "Promedio municipal de días desde 'FECHA_RESULTADO' a 'FECHA_ALTA' (estimada). Para los municipios con menos de 3 hospitalizaciones se utilizó el promedio por jurisdicción sanitaria.",
@@ -358,7 +358,9 @@ def formatLegendlabel(eval, i, ant):
     if i == 0:
         if min == max: label = f'{format(min)} ({count:,})'
         else: label = f'{format(min)} - {format(max)} ({count:,})'
-    else: label = f'{format(str(float(min)+0.1))} - {format(max)} ({count:,})'
+    else:
+        new_min = format(str(float(min)+0.1))
+        label = f'{"0" if new_min=="-0.0" else new_min} - {format(max)} ({count:,})'
     ant += count
     return label, ant
 
