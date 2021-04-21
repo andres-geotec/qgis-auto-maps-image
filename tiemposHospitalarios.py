@@ -349,6 +349,8 @@ def formatLegendlabel(eval, i, ant):
     def format(n):
         if '.' in n: return f'{float(n):.1f}'
         return n
+    def formatCero(label):
+        return "0" if label=="-0.0" or label=="0.0" else label
     min = eval.split(' - ')[0]
     max = eval.split(' - ')[1]
     #query = f'"{targetFieldNameData}" >= {float(min)} and "{targetFieldNameData}" < {float(max)}'
@@ -356,11 +358,11 @@ def formatLegendlabel(eval, i, ant):
     label = ''
     count = countFeaturesByQuery(query, muns)-ant
     if i == 0:
-        if min == max: label = f'{format(min)} ({count:,})'
-        else: label = f'{format(min)} - {format(max)} ({count:,})'
+        if min == max: label = f'{formatCero(format(min))} ({count:,})'
+        else: label = f'{formatCero(format(min))} - {formatCero(format(max))} ({count:,})'
     else:
         new_min = format(str(float(min)+0.1))
-        label = f'{"0" if new_min=="-0.0" else new_min} - {format(max)} ({count:,})'
+        label = f'{formatCero(new_min)} - {formatCero(format(max))} ({count:,})'
     ant += count
     return label, ant
 
