@@ -6,10 +6,10 @@ from PIL import Image
 import os
 
 methods = ['Jenks']
-PATHMAIN = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria'
+PATHMAIN = '/home/andres/Escritorio/conacyt/201119_AtencionHospitalaria'
 now = datetime.today()
-#now = datetime(2021,2,24)
-path = os.path.join(PATHMAIN, '{}COVID19MEXICOTOT'.format(str(now).replace('-','')[2:8]))
+#now = datetime(2021,5,12)
+path = os.path.join(PATHMAIN, '{}hospitalario'.format(str(now).replace('-','')[2:8]))
 print(now)
 
 dataMaps = [{
@@ -27,7 +27,7 @@ dataMaps = [{
     'title': 'Respuesta hospitalaria (no ambulatorios)',
     'subtitle': 'Tiempo promedio entre fecha de ingreso y resultado de personas hospitalizadas',
     'date': f"{now.day} de {now.strftime('%B').title()} de {now.year}",
-    'note': 'Días promedio desde "FECHA_INGRESO" a "FECHA_RESULTADO", agrupado por municipio y semana epidemiológica. En los municipios con menos de 3 casos ambulatorios se utilizó el promedio por jurisdicción sanitaria.',
+    'note': 'Días promedio desde "FECHA_INGRESO" a "FECHA_RESULTADO", agrupado por municipio y semana epidemiológica. En los municipios con menos de 3 hospitalizaciones se utilizó el promedio por jurisdicción sanitaria.',
     'source': 'Secretaría de Salud: "{}COVID19MEXICOTOT" de la Dirección General de Epidemiología.'.format(str(now).replace('-','')[2:8]),
     'legend': 'Días Promedio',
     'targetFieldName': 'cvegeomun',

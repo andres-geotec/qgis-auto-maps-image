@@ -6,10 +6,10 @@ import os
 
 
 #Instance path proyect application
-PATHMAIN = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria'
+PATHMAIN = '/home/andres/Escritorio/conacyt/201119_AtencionHospitalaria'
 now = datetime.today()
-#now = datetime(2021,2,10)
-path = os.path.join(PATHMAIN, '{}COVID19MEXICOTOT'.format(str(now).replace('-','')[2:8]))
+#now = datetime(2021,5,12)
+path = os.path.join(PATHMAIN, '{}hospitalario'.format(str(now).replace('-','')[2:8]))
 #path = '/home/andres/Proyectos/CONACyT/201119_AtencionHospitalaria/210120COVID19MEXICOTOT/'
 outputFolder = 'image-maps'
 templeteFolder = 'templetes'
@@ -361,7 +361,7 @@ def formatLegendlabel(eval, i, ant):
         if min == max: label = f'{formatCero(format(min))} ({count:,})'
         else: label = f'{formatCero(format(min))} - {formatCero(format(max))} ({count:,})'
     else:
-        new_min = format(str(float(min)+0.1))
+        new_min = format(str(float(format(min))+0.1))
         label = f'{formatCero(new_min)} - {formatCero(format(max))} ({count:,})'
     ant += count
     return label, ant
@@ -461,6 +461,7 @@ for dataMap in dataMaps:
                 exportImageMap(image_name, buildImageMap(dataMap))
 
     muns.removeJoin(join.joinLayerId())
+    #QgsProject.instance().addMapLayer(muns)
     
 #createMap(dataMaps[0])
 print('*** Proceso finalizado ***')
